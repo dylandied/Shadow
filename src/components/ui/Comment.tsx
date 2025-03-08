@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
@@ -7,17 +6,10 @@ import CommentHeader from "./comment/CommentHeader";
 import CommentBody from "./comment/CommentBody";
 import CommentActions from "./comment/CommentActions";
 import CommentReplyForm from "./comment/CommentReplyForm";
-import CommentReplies from "./comment/CommentReplies";
+import CommentReplies, { Reply } from "./comment/CommentReplies";
 
-// Define Reply type for comment replies
-export type Reply = {
-  id: string;
-  username: string;
-  content: string;
-  timestamp: Date;
-  upvotes: number;
-  downvotes: number;
-};
+// Export Reply type for use in other components
+export type { Reply };
 
 type CommentProps = {
   id: string;

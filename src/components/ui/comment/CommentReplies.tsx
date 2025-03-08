@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import CommentReplyForm from "./CommentReplyForm";
 
 // Define Reply type for better structure
-type Reply = {
+export type Reply = {
   id: string;
   username: string;
   content: string;
@@ -107,7 +107,11 @@ const CommentReplies = ({ replies, onAddReply, commentId, className }: CommentRe
   return (
     <div className={cn("mt-3 border-l-2 border-border pl-3 sm:pl-4", className)}>
       <button 
-        onClick={() => setShowReplies(!showReplies)}
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          setShowReplies(!showReplies);
+        }}
         className="text-xs text-muted-foreground hover:text-primary transition-colors focus:outline-none"
       >
         {replies.length} {replies.length === 1 ? "reply" : "replies"}
@@ -119,13 +123,18 @@ const CommentReplies = ({ replies, onAddReply, commentId, className }: CommentRe
             const localReply = localReplies[reply.id] || { upvotes: reply.upvotes, downvotes: reply.downvotes };
             const userVote = userVotes[reply.id];
             
+            // Ensure timestamp is a valid Date object
+            const replyDate = reply.timestamp instanceof Date 
+              ? reply.timestamp 
+              : new Date(reply.timestamp);
+            
             return (
               <div key={reply.id} className="p-2 bg-background/50 rounded-md">
                 <div className="flex justify-between items-start">
                   <div>
                     <span className="font-medium">{reply.username}</span>
                     <span className="text-xs text-muted-foreground ml-2">
-                      {formatDistanceToNow(new Date(reply.timestamp), { addSuffix: true })}
+                      {formatDistanceToNow(replyDate, { addSuffix: true })}
                     </span>
                   </div>
                 </div>
@@ -136,6 +145,7 @@ const CommentReplies = ({ replies, onAddReply, commentId, className }: CommentRe
                   <Button
                     variant="ghost"
                     size="sm"
+                    type="button"
                     className={cn(
                       "h-7 px-2 text-xs",
                       userVote === "up" ? "text-insight-positive" : "text-muted-foreground"
@@ -149,6 +159,7 @@ const CommentReplies = ({ replies, onAddReply, commentId, className }: CommentRe
                   <Button
                     variant="ghost"
                     size="sm"
+                    type="button"
                     className={cn(
                       "h-7 px-2 text-xs",
                       userVote === "down" ? "text-insight-negative" : "text-muted-foreground"
@@ -162,6 +173,7 @@ const CommentReplies = ({ replies, onAddReply, commentId, className }: CommentRe
                   <Button
                     variant="ghost"
                     size="sm"
+                    type="button"
                     className="h-7 px-2 text-xs text-muted-foreground"
                     onClick={() => handleReply(reply.username)}
                   >
@@ -176,6 +188,7 @@ const CommentReplies = ({ replies, onAddReply, commentId, className }: CommentRe
           <Button
             variant="outline"
             size="sm"
+            type="button"
             className="mt-2 text-xs"
             onClick={() => {
               setIsReplying(true);
