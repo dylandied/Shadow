@@ -1,15 +1,17 @@
 
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Building, Plus } from "lucide-react";
+import { Menu, X, Building, Plus, UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AddCompanyDialog } from "@/components/ui/AddCompanyDialog";
+import { AuthDialog } from "@/components/ui/AuthDialog";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
   const location = useLocation();
   
   // Handle scroll effect
@@ -47,7 +49,7 @@ const Navbar = () => {
           </div>
           
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-4">
             <Link 
               to="/" 
               className={cn(
@@ -70,6 +72,11 @@ const Navbar = () => {
             <Button variant="outline" size="sm" className="hover-lift" onClick={() => setIsAddCompanyOpen(true)}>
               <Plus className="h-4 w-4 mr-1" />
               <span>Add Company</span>
+            </Button>
+            
+            <Button variant="default" size="sm" onClick={() => setIsAuthOpen(true)}>
+              <UserCircle className="h-4 w-4 mr-1" />
+              <span>Sign In</span>
             </Button>
           </nav>
           
@@ -126,12 +133,28 @@ const Navbar = () => {
               <Plus className="h-4 w-4 mr-1" />
               <span>Add Company</span>
             </Button>
+            
+            <Button
+              variant="default"
+              size="sm"
+              className="w-full flex items-center justify-center"
+              onClick={() => {
+                setIsAuthOpen(true);
+                setIsMobileMenuOpen(false);
+              }}
+            >
+              <UserCircle className="h-4 w-4 mr-1" />
+              <span>Sign In</span>
+            </Button>
           </div>
         </div>
       )}
       
       {/* Add Company Dialog */}
       <AddCompanyDialog open={isAddCompanyOpen} onOpenChange={setIsAddCompanyOpen} />
+      
+      {/* Auth Dialog */}
+      <AuthDialog open={isAuthOpen} onOpenChange={setIsAuthOpen} />
     </header>
   );
 };
