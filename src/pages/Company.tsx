@@ -1,9 +1,18 @@
+
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { mockCompanies, mockComments } from "@/data/mockData";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+
+// Import the missing components
+import CompanyHeader from "@/components/company/CompanyHeader";
+import InsightsSection from "@/components/company/InsightsSection";
+import DiscussionSection from "@/components/company/DiscussionSection";
+import LoadingState from "@/components/company/LoadingState";
+import NotFoundState from "@/components/company/NotFoundState";
 
 const generateMockPriceData = (basePrice: number, volatility: number = 0.05) => {
   const today = new Date();
@@ -29,6 +38,7 @@ const generateMockPriceData = (basePrice: number, volatility: number = 0.05) => 
 
 const Company = () => {
   const { id } = useParams<{ id: string }>();
+  const { toast } = useToast();
   const [company, setCompany] = useState<any>(null);
   const [comments, setComments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
