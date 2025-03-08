@@ -1,13 +1,19 @@
 
 import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, TrendingUp, TrendingDown } from "lucide-react";
 import { motion } from "framer-motion";
 
 type CompanyHeaderProps = {
   company: any;
+  price?: number | null;
+  priceChange?: {
+    value: number;
+    percentage: number;
+    direction: "up" | "down" | "neutral";
+  };
 };
 
-const CompanyHeader = ({ company }: CompanyHeaderProps) => {
+const CompanyHeader = ({ company, price, priceChange }: CompanyHeaderProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -34,7 +40,22 @@ const CompanyHeader = ({ company }: CompanyHeaderProps) => {
             </div>
           )}
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">{company.name}</h1>
+            <div className="flex items-center">
+              <h1 className="text-2xl sm:text-3xl font-bold">{company.name}</h1>
+              {price && priceChange && (
+                <div className="ml-4 flex items-center">
+                  <span className="font-semibold">${price.toFixed(2)}</span>
+                  <div className={`ml-2 flex items-center text-sm ${priceChange.direction === 'up' ? 'text-insight-positive' : 'text-insight-negative'}`}>
+                    {priceChange.direction === 'up' ? (
+                      <TrendingUp className="h-4 w-4 mr-1" />
+                    ) : (
+                      <TrendingDown className="h-4 w-4 mr-1" />
+                    )}
+                    <span>{priceChange.percentage}%</span>
+                  </div>
+                </div>
+              )}
+            </div>
             <p className="text-sm text-muted-foreground">{company.ticker} • {company.industry}</p>
           </div>
         </div>

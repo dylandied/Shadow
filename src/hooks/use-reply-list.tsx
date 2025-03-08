@@ -21,7 +21,7 @@ export function useReplyList({ initialReplies }: UseReplyListProps) {
     const currentVote = userVotes[replyId];
     
     setUserVotes(prev => {
-      if (prev[replyId] === voteType) {
+      if (currentVote === voteType) {
         // User is un-voting
         const newVotes = { ...prev };
         delete newVotes[replyId];

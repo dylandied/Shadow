@@ -12,6 +12,7 @@ type InsightCardProps = {
   change?: ChangeDirection;
   sourcesCount: number;
   lastUpdated: string;
+  chartData?: { date: string; value: number }[]; // Optional chart data
 };
 
 const InsightCard = ({
@@ -21,6 +22,7 @@ const InsightCard = ({
   change = "neutral",
   sourcesCount,
   lastUpdated,
+  chartData,
 }: InsightCardProps) => {
   return (
     <motion.div

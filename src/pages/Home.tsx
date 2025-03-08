@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Search, Filter, ArrowRight } from "lucide-react";
+import { Search, Filter, ArrowRight, TrendingUp, TrendingDown } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,19 +38,50 @@ const itemVariants = {
   }
 };
 
+// Generate a mock price and 24h change based on company ticker
+const generateMockPrice = (ticker: string) => {
+  // Use the ASCII values of the ticker to generate a consistent base price
+  const basePrice = (ticker.charCodeAt(0) + ticker.charCodeAt(1) + ticker.charCodeAt(2)) / 3 * 10;
+  
+  // Generate a random 24h change
+  const changePercent = (Math.random() * 10 - 5).toFixed(2); // -5% to +5%
+  const direction = parseFloat(changePercent) >= 0 ? "up" : "down";
+  
+  return {
+    price: basePrice.toFixed(2),
+    changePercent,
+    direction
+  };
+};
+
 const Home = () => {
   const [filter, setFilter] = useState("all");
-  const [companies, setCompanies] = useState(mockCompanies);
+  const [companies, setCompanies] = useState<any[]>([]);
+  
+  useEffect(() => {
+    // Add price data to companies
+    const companiesWithPrices = mockCompanies.map(company => {
+      const priceData = generateMockPrice(company.ticker);
+      return {
+        ...company,
+        price: priceData.price,
+        priceChange: priceData.changePercent,
+        priceDirection: priceData.direction
+      };
+    });
+    
+    setCompanies(companiesWithPrices);
+  }, []);
   
   const handleFilterChange = (newFilter: string) => {
     setFilter(newFilter);
     
     if (newFilter === "all") {
-      setCompanies(mockCompanies);
+      setCompanies(companies);
     } else if (newFilter === "trending") {
-      setCompanies([...mockCompanies].sort((a, b) => b.activityLevel - a.activityLevel));
+      setCompanies([...companies].sort((a, b) => b.activityLevel - a.activityLevel));
     } else if (newFilter === "new") {
-      setCompanies([...mockCompanies].sort((a, b) => b.lastUpdate.getTime() - a.lastUpdate.getTime()));
+      setCompanies([...companies].sort((a, b) => b.lastUpdate.getTime() - a.lastUpdate.getTime()));
     }
   };
   
@@ -142,8 +172,23 @@ const Home = () => {
                         </div>
                       )}
                       <div>
-                        <CardTitle className="text-lg">{company.name}</CardTitle>
-                        <CardDescription>{company.ticker}</CardDescription>
+                        <div className="flex items-center">
+                          <CardTitle className="text-lg">{company.name}</CardTitle>
+                          <div className={`ml-2 flex items-center ${company.priceDirection === 'up' ? 'text-insight-positive' : 'text-insight-negative'}`}>
+                            {company.priceDirection === 'up' ? (
+                              <TrendingUp className="h-4 w-4" />
+                            ) : (
+                              <TrendingDown className="h-4 w-4" />
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center">
+                          <CardDescription>{company.ticker}</CardDescription>
+                          <span className="text-xs ml-2">${company.price}</span>
+                          <span className={`text-xs ml-1 ${company.priceDirection === 'up' ? 'text-insight-positive' : 'text-insight-negative'}`}>
+                            {company.priceChange}%
+                          </span>
+                        </div>
                       </div>
                     </div>
                     {company.isHot && (
