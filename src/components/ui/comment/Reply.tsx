@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { memo } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { ArrowUp, ArrowDown, Reply as ReplyIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ type ReplyItemProps = {
   localReply: { upvotes: number; downvotes: number };
 };
 
-const ReplyItem = ({ 
+const ReplyItem = memo(({ 
   reply, 
   onReply, 
   onVote, 
@@ -81,6 +81,9 @@ const ReplyItem = ({
       </div>
     </div>
   );
-};
+});
+
+// Add display name for better debugging in React DevTools
+ReplyItem.displayName = "ReplyItem";
 
 export default ReplyItem;

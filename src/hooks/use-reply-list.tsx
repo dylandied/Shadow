@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Reply } from "@/components/ui/comment/types";
 
 interface UseReplyListProps {
@@ -17,10 +17,10 @@ export function useReplyList({ initialReplies }: UseReplyListProps) {
     }), {})
   );
   
-  const handleVote = (replyId: string, voteType: "up" | "down") => {
-    const currentVote = userVotes[replyId];
-    
+  const handleVote = useCallback((replyId: string, voteType: "up" | "down") => {
     setUserVotes(prev => {
+      const currentVote = prev[replyId];
+      
       if (prev[replyId] === voteType) {
         // User is un-voting
         const newVotes = { ...prev };
@@ -33,7 +33,8 @@ export function useReplyList({ initialReplies }: UseReplyListProps) {
     });
     
     setLocalReplies(prev => {
-      const reply = prev[replyId] || { upvotes: 0, downvotes: 0 };
+      const currentVote = userVotes[replyId];
+      const reply = { ...prev[replyId] } || { upvotes: 0, downvotes: 0 };
       
       // Reset previous vote if exists
       if (currentVote === "up") {
@@ -51,12 +52,12 @@ export function useReplyList({ initialReplies }: UseReplyListProps) {
       
       return { ...prev, [replyId]: reply };
     });
-  };
+  }, [userVotes]);
   
-  const handleReply = (username: string) => {
+  const handleReply = useCallback((username: string) => {
     setIsReplying(true);
     setReplyingTo(username);
-  };
+  }, []);
   
   return {
     isReplying,

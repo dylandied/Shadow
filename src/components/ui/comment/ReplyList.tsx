@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Reply as ReplyType } from "./types";
 import ReplyItem from "./Reply";
@@ -26,7 +26,7 @@ const ReplyList = ({ replies, onAddReply }: ReplyListProps) => {
   
   const [lastReplyTime, setLastReplyTime] = useState<Date | null>(null);
   
-  const handleSubmitReply = (content: string) => {
+  const handleSubmitReply = useCallback((content: string) => {
     const now = new Date();
     const fiveMinutesInMs = 5 * 60 * 1000;
     
@@ -48,7 +48,17 @@ const ReplyList = ({ replies, onAddReply }: ReplyListProps) => {
     setLastReplyTime(now);
     setIsReplying(false);
     setReplyingTo(null);
-  };
+  }, [lastReplyTime, replyingTo, onAddReply, setIsReplying, setReplyingTo]);
+  
+  const handleCancelReply = useCallback(() => {
+    setIsReplying(false);
+    setReplyingTo(null);
+  }, [setIsReplying, setReplyingTo]);
+  
+  const handleOpenReplyForm = useCallback(() => {
+    setIsReplying(true);
+    setReplyingTo(null);
+  }, [setIsReplying, setReplyingTo]);
   
   return (
     <div className="mt-2 space-y-3">
@@ -73,10 +83,7 @@ const ReplyList = ({ replies, onAddReply }: ReplyListProps) => {
         size="sm"
         type="button"
         className="mt-2 text-xs"
-        onClick={() => {
-          setIsReplying(true);
-          setReplyingTo(null);
-        }}
+        onClick={handleOpenReplyForm}
       >
         Add Reply
       </Button>
@@ -84,10 +91,7 @@ const ReplyList = ({ replies, onAddReply }: ReplyListProps) => {
       {isReplying && (
         <CommentReplyForm 
           onSubmit={handleSubmitReply}
-          onCancel={() => {
-            setIsReplying(false);
-            setReplyingTo(null);
-          }}
+          onCancel={handleCancelReply}
           replyingTo={replyingTo}
         />
       )}
