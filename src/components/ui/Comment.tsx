@@ -1,13 +1,13 @@
 
 import { useState } from "react";
-import { formatDistanceToNow } from "date-fns";
-import { MessageSquare, ThumbsUp, ThumbsDown, Bitcoin, ArrowUp, ArrowDown, Reply } from "lucide-react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import UserBadge from "./UserBadge";
-import TipButton from "./TipButton";
 import { cn } from "@/lib/utils";
+import CommentHeader from "./comment/CommentHeader";
+import CommentBody from "./comment/CommentBody";
+import CommentActions from "./comment/CommentActions";
+import CommentReplyForm from "./comment/CommentReplyForm";
+import CommentReplies from "./comment/CommentReplies";
 
 type CommentProps = {
   id: string;
@@ -39,7 +39,6 @@ const Comment = ({
   className,
 }: CommentProps) => {
   const [isReplying, setIsReplying] = useState(false);
-  const [replyContent, setReplyContent] = useState("");
   const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
   const [localUpvotes, setLocalUpvotes] = useState(upvotes);
   const [localDownvotes, setLocalDownvotes] = useState(downvotes);
@@ -70,27 +69,13 @@ const Comment = ({
     }
   };
   
-  const handleSubmitReply = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (replyContent.trim()) {
-      // In a real application, this would make an API call to save the reply
-      toast({
-        title: "Reply submitted",
-        description: "Your reply has been posted.",
-      });
-      setReplyContent("");
-      setIsReplying(false);
-    }
-  };
-  
-  const handleCopyBitcoinAddress = () => {
-    if (bitcoinAddress) {
-      navigator.clipboard.writeText(bitcoinAddress);
-      toast({
-        title: "Address Copied",
-        description: "Bitcoin address copied to clipboard.",
-      });
-    }
+  const handleSubmitReply = (replyContent: string) => {
+    // In a real application, this would make an API call to save the reply
+    toast({
+      title: "Reply submitted",
+      description: "Your reply has been posted.",
+    });
+    setIsReplying(false);
   };
   
   return (
@@ -104,118 +89,35 @@ const Comment = ({
         className
       )}
     >
-      <div className="flex justify-between items-start">
-        <div className="flex items-center">
-          <div className="flex flex-col">
-            <div className="flex flex-wrap items-center gap-1 sm:gap-2">
-              <h4 className="font-medium">{username}</h4>
-              {isEmployee && <UserBadge type="insider" size="sm" />}
-              {userReputation && <UserBadge type={userReputation} size="sm" />}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {formatDistanceToNow(timestamp, { addSuffix: true })}
-            </p>
-          </div>
-        </div>
-        
-        {isEmployee && bitcoinAddress && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-xs flex items-center space-x-1"
-            onClick={handleCopyBitcoinAddress}
-          >
-            <Bitcoin className="h-3 w-3" />
-            <span className="hidden sm:inline">Copy Address</span>
-          </Button>
-        )}
-      </div>
+      <CommentHeader 
+        username={username}
+        isEmployee={isEmployee}
+        userReputation={userReputation}
+        timestamp={timestamp}
+        bitcoinAddress={bitcoinAddress}
+      />
       
-      <div className="mt-2 sm:mt-3">
-        <p className="text-sm whitespace-pre-line">{content}</p>
-      </div>
+      <CommentBody content={content} />
       
-      <div className="mt-2 sm:mt-3 flex flex-wrap items-center justify-between gap-y-2">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn(
-              "h-8 px-2 text-xs",
-              userVote === "up" ? "text-insight-positive" : "text-muted-foreground"
-            )}
-            onClick={handleUpvote}
-          >
-            <ArrowUp className="h-3 w-3 mr-1" />
-            <span>{localUpvotes}</span>
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn(
-              "h-8 px-2 text-xs",
-              userVote === "down" ? "text-insight-negative" : "text-muted-foreground"
-            )}
-            onClick={handleDownvote}
-          >
-            <ArrowDown className="h-3 w-3 mr-1" />
-            <span>{localDownvotes}</span>
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 px-2 text-xs text-muted-foreground"
-            onClick={() => setIsReplying(!isReplying)}
-          >
-            <Reply className="h-3 w-3 mr-1" />
-            <span className="hidden xs:inline">Reply</span>
-          </Button>
-        </div>
-        
-        {isEmployee && bitcoinAddress && (
-          <TipButton bitcoinAddress={bitcoinAddress} />
-        )}
-      </div>
+      <CommentActions 
+        isEmployee={isEmployee}
+        bitcoinAddress={bitcoinAddress}
+        upvotes={localUpvotes}
+        downvotes={localDownvotes}
+        userVote={userVote}
+        onUpvote={handleUpvote}
+        onDownvote={handleDownvote}
+        onReply={() => setIsReplying(!isReplying)}
+      />
       
       {isReplying && (
-        <div className="mt-3">
-          <form onSubmit={handleSubmitReply}>
-            <textarea
-              value={replyContent}
-              onChange={(e) => setReplyContent(e.target.value)}
-              className="w-full p-2 border border-border rounded-lg bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary/20"
-              placeholder="Write a reply..."
-              rows={3}
-            />
-            <div className="mt-2 flex justify-end space-x-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsReplying(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                size="sm"
-              >
-                Submit
-              </Button>
-            </div>
-          </form>
-        </div>
+        <CommentReplyForm 
+          onSubmit={handleSubmitReply}
+          onCancel={() => setIsReplying(false)}
+        />
       )}
       
-      {replies.length > 0 && (
-        <div className="mt-3 border-l-2 border-border pl-3 sm:pl-4 space-y-3">
-          <p className="text-xs text-muted-foreground">
-            {replies.length} {replies.length === 1 ? "reply" : "replies"}
-          </p>
-        </div>
-      )}
+      <CommentReplies replies={replies} />
     </motion.div>
   );
 };
