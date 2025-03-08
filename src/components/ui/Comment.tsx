@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { MessageSquare, ThumbsUp, ThumbsDown, Bitcoin } from "lucide-react";
+import { MessageSquare, ThumbsUp, ThumbsDown, Bitcoin, ArrowUp, ArrowDown, Reply } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
@@ -99,7 +99,7 @@ const Comment = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       className={cn(
-        "p-4 rounded-lg",
+        "p-3 sm:p-4 rounded-lg",
         isEmployee ? "bg-card border border-border" : "bg-background border border-border/50",
         className
       )}
@@ -107,10 +107,10 @@ const Comment = ({
       <div className="flex justify-between items-start">
         <div className="flex items-center">
           <div className="flex flex-col">
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center gap-1 sm:gap-2">
               <h4 className="font-medium">{username}</h4>
-              {isEmployee && <UserBadge type="insider" />}
-              {userReputation && <UserBadge type={userReputation} />}
+              {isEmployee && <UserBadge type="insider" size="sm" />}
+              {userReputation && <UserBadge type={userReputation} size="sm" />}
             </div>
             <p className="text-xs text-muted-foreground">
               {formatDistanceToNow(timestamp, { addSuffix: true })}
@@ -131,22 +131,22 @@ const Comment = ({
         )}
       </div>
       
-      <div className="mt-3">
+      <div className="mt-2 sm:mt-3">
         <p className="text-sm whitespace-pre-line">{content}</p>
       </div>
       
-      <div className="mt-3 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+      <div className="mt-2 sm:mt-3 flex flex-wrap items-center justify-between gap-y-2">
+        <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="sm"
             className={cn(
-              "text-xs h-8 px-2",
+              "h-8 px-2 text-xs",
               userVote === "up" ? "text-insight-positive" : "text-muted-foreground"
             )}
             onClick={handleUpvote}
           >
-            <ThumbsUp className="h-3 w-3 mr-1" />
+            <ArrowUp className="h-3 w-3 mr-1" />
             <span>{localUpvotes}</span>
           </Button>
           
@@ -154,23 +154,23 @@ const Comment = ({
             variant="ghost"
             size="sm"
             className={cn(
-              "text-xs h-8 px-2",
+              "h-8 px-2 text-xs",
               userVote === "down" ? "text-insight-negative" : "text-muted-foreground"
             )}
             onClick={handleDownvote}
           >
-            <ThumbsDown className="h-3 w-3 mr-1" />
+            <ArrowDown className="h-3 w-3 mr-1" />
             <span>{localDownvotes}</span>
           </Button>
           
           <Button
             variant="ghost"
             size="sm"
-            className="text-xs h-8 px-2 text-muted-foreground"
+            className="h-8 px-2 text-xs text-muted-foreground"
             onClick={() => setIsReplying(!isReplying)}
           >
-            <MessageSquare className="h-3 w-3 mr-1" />
-            <span>Reply</span>
+            <Reply className="h-3 w-3 mr-1" />
+            <span className="hidden xs:inline">Reply</span>
           </Button>
         </div>
         
@@ -210,8 +210,7 @@ const Comment = ({
       )}
       
       {replies.length > 0 && (
-        <div className="mt-3 border-l-2 border-border pl-4 space-y-3">
-          {/* This would render nested comments but for simplicity we'll just show a placeholder */}
+        <div className="mt-3 border-l-2 border-border pl-3 sm:pl-4 space-y-3">
           <p className="text-xs text-muted-foreground">
             {replies.length} {replies.length === 1 ? "reply" : "replies"}
           </p>

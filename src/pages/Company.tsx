@@ -118,13 +118,13 @@ const Company = () => {
   }
   
   return (
-    <div className="container mx-auto px-4 pt-24 pb-16">
+    <div className="container mx-auto px-3 sm:px-4 pt-20 sm:pt-24 pb-16">
       {/* Company Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="mb-8"
+        className="mb-6 sm:mb-8"
       >
         <Link to="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4">
           <ArrowLeft className="mr-1 h-4 w-4" />
@@ -137,21 +137,21 @@ const Company = () => {
               <img
                 src={company.logo}
                 alt={company.name}
-                className="w-12 h-12 mr-4 rounded-full"
+                className="w-10 h-10 sm:w-12 sm:h-12 mr-3 sm:mr-4 rounded-full"
               />
             ) : (
-              <div className="w-12 h-12 mr-4 rounded-full bg-accent flex items-center justify-center text-lg font-medium">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 mr-3 sm:mr-4 rounded-full bg-accent flex items-center justify-center text-lg font-medium">
                 {company.name.charAt(0)}
               </div>
             )}
             <div>
-              <h1 className="text-3xl font-bold">{company.name}</h1>
-              <p className="text-muted-foreground">{company.ticker} • {company.industry}</p>
+              <h1 className="text-2xl sm:text-3xl font-bold">{company.name}</h1>
+              <p className="text-sm text-muted-foreground">{company.ticker} • {company.industry}</p>
             </div>
           </div>
           
           <div className="flex items-center space-x-2">
-            <div className="text-sm text-muted-foreground mr-2">
+            <div className="text-xs sm:text-sm text-muted-foreground mr-2">
               {company.insidersCount} {company.insidersCount === 1 ? "insider" : "insiders"} •
               Last update: {company.lastUpdate.toLocaleDateString()}
             </div>
@@ -168,7 +168,7 @@ const Company = () => {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-10"
       >
         <motion.div variants={itemVariants}>
           <InsightCard
@@ -216,9 +216,9 @@ const Company = () => {
       </motion.div>
       
       {/* Comments Section */}
-      <div className="bg-card border border-border rounded-lg shadow-sm p-6">
+      <div className="bg-card border border-border rounded-lg shadow-sm p-4 sm:p-6">
         <Tabs defaultValue="discussions" className="w-full">
-          <TabsList className="mb-6">
+          <TabsList className="mb-4 sm:mb-6">
             <TabsTrigger value="discussions">
               <MessageSquare className="h-4 w-4 mr-2" />
               Discussions
@@ -227,14 +227,15 @@ const Company = () => {
           
           <TabsContent value="discussions">
             {/* Sorting Options */}
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold">Insider Insights</h3>
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-3">
+              <h3 className="text-lg sm:text-xl font-bold">Insider Insights</h3>
               
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Button
                   variant={sortBy === "recent" ? "default" : "outline"}
                   size="sm"
                   onClick={() => handleSortChange("recent")}
+                  className="text-xs h-8"
                 >
                   Recent
                 </Button>
@@ -242,6 +243,7 @@ const Company = () => {
                   variant={sortBy === "upvoted" ? "default" : "outline"}
                   size="sm"
                   onClick={() => handleSortChange("upvoted")}
+                  className="text-xs h-8"
                 >
                   Most Upvoted
                 </Button>
@@ -249,6 +251,7 @@ const Company = () => {
                   variant={sortBy === "tipped" ? "default" : "outline"}
                   size="sm"
                   onClick={() => handleSortChange("tipped")}
+                  className="text-xs h-8"
                 >
                   Most Tipped
                 </Button>
@@ -256,11 +259,11 @@ const Company = () => {
             </div>
             
             {/* Add Comment Form */}
-            <div className="mb-8">
+            <div className="mb-6 sm:mb-8">
               <form onSubmit={handleSubmitComment}>
                 <div className="border border-border rounded-lg overflow-hidden mb-3">
                   <textarea
-                    className="w-full p-4 bg-background resize-none focus:outline-none"
+                    className="w-full p-3 bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary/20"
                     placeholder="Share your insights or ask a question..."
                     rows={3}
                     value={commentText}
@@ -268,7 +271,7 @@ const Company = () => {
                   />
                 </div>
                 <div className="flex justify-end">
-                  <Button type="submit" disabled={!commentText.trim()}>
+                  <Button type="submit" disabled={!commentText.trim()} size="sm" className="sm:h-10">
                     Post Comment
                   </Button>
                 </div>
@@ -276,7 +279,7 @@ const Company = () => {
             </div>
             
             {/* Comments List */}
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {comments.length > 0 ? (
                 comments.map((comment) => (
                   <Comment
@@ -294,7 +297,7 @@ const Company = () => {
                   />
                 ))
               ) : (
-                <div className="text-center py-8">
+                <div className="text-center py-6 sm:py-8">
                   <p className="text-muted-foreground">
                     No comments yet. Be the first to share an insight!
                   </p>
