@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Bitcoin } from "lucide-react";
+import { Bitcoin, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,7 +21,6 @@ type TipButtonProps = {
 };
 
 const TipButton = ({ bitcoinAddress, size = "md" }: TipButtonProps) => {
-  const [amount, setAmount] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   
@@ -29,23 +28,15 @@ const TipButton = ({ bitcoinAddress, size = "md" }: TipButtonProps) => {
     navigator.clipboard.writeText(bitcoinAddress);
     setIsCopied(true);
     
+    // Show success toast
+    toast({
+      title: "Address Copied",
+      description: "Bitcoin address copied to clipboard.",
+    });
+    
     setTimeout(() => {
       setIsCopied(false);
     }, 2000);
-  };
-  
-  const handleOpenWallet = () => {
-    // In a real application, this would generate a proper Bitcoin payment URI
-    const uri = `bitcoin:${bitcoinAddress}?amount=${amount}`;
-    window.open(uri, "_blank");
-    
-    // Show success toast
-    toast({
-      title: "Tip initiated",
-      description: "Your Bitcoin wallet app should have opened.",
-    });
-    
-    setIsOpen(false);
   };
   
   return (
@@ -65,7 +56,7 @@ const TipButton = ({ bitcoinAddress, size = "md" }: TipButtonProps) => {
         <DialogHeader>
           <DialogTitle>Send Bitcoin Tip</DialogTitle>
           <DialogDescription>
-            Send a tip directly to this insider's Bitcoin address.
+            Copy this Bitcoin address to send a tip using your preferred wallet.
           </DialogDescription>
         </DialogHeader>
         
@@ -84,41 +75,24 @@ const TipButton = ({ bitcoinAddress, size = "md" }: TipButtonProps) => {
                 variant="outline"
                 size="sm"
                 onClick={handleCopyAddress}
+                className="flex-shrink-0"
               >
-                {isCopied ? "Copied!" : "Copy"}
+                {isCopied ? 
+                  <><Check className="h-4 w-4 mr-1" /> Copied</> : 
+                  <><Copy className="h-4 w-4 mr-1" /> Copy</>
+                }
               </Button>
             </div>
           </div>
-          
-          <div className="grid gap-2">
-            <Label htmlFor="amount">Amount (BTC)</Label>
-            <Input
-              id="amount"
-              type="number"
-              step="0.00001"
-              min="0.00001"
-              placeholder="0.001"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-            />
-          </div>
         </div>
         
-        <DialogFooter className="sm:justify-between">
+        <DialogFooter className="sm:justify-start">
           <Button
             type="button"
             variant="outline"
             onClick={() => setIsOpen(false)}
           >
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            onClick={handleOpenWallet}
-            disabled={!amount || parseFloat(amount) <= 0}
-          >
-            <Bitcoin className="h-4 w-4 mr-1" />
-            <span>Send Tip</span>
+            Close
           </Button>
         </DialogFooter>
       </DialogContent>
