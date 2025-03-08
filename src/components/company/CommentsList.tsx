@@ -6,10 +6,15 @@ type CommentsListProps = {
 };
 
 const CommentsList = ({ comments }: CommentsListProps) => {
+  // Sort comments by timestamp in descending order (newest first)
+  const sortedComments = [...comments].sort((a, b) => 
+    new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  );
+
   return (
     <div className="space-y-3 sm:space-y-4">
-      {comments.length > 0 ? (
-        comments.map((comment) => (
+      {sortedComments.length > 0 ? (
+        sortedComments.map((comment) => (
           <Comment
             key={comment.id}
             id={comment.id}
