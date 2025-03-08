@@ -1,13 +1,15 @@
 
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Search, Menu, X } from "lucide-react";
+import { Menu, X, Building, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { AddCompanyDialog } from "@/components/ui/AddCompanyDialog";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
   const location = useLocation();
   
   // Handle scroll effect
@@ -65,9 +67,9 @@ const Navbar = () => {
               How It Works
             </Link>
             
-            <Button variant="outline" size="sm" className="hover-lift">
-              <Search className="h-4 w-4 mr-1" />
-              <span>Search</span>
+            <Button variant="outline" size="sm" className="hover-lift" onClick={() => setIsAddCompanyOpen(true)}>
+              <Plus className="h-4 w-4 mr-1" />
+              <span>Add Company</span>
             </Button>
           </nav>
           
@@ -112,19 +114,24 @@ const Navbar = () => {
               How It Works
             </Link>
             
-            <div className="relative w-full">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <Search className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <input
-                type="search"
-                className="pl-10 w-full h-10 rounded-md bg-secondary/50 border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                placeholder="Search companies..."
-              />
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full flex items-center justify-center"
+              onClick={() => {
+                setIsAddCompanyOpen(true);
+                setIsMobileMenuOpen(false);
+              }}
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              <span>Add Company</span>
+            </Button>
           </div>
         </div>
       )}
+      
+      {/* Add Company Dialog */}
+      <AddCompanyDialog open={isAddCompanyOpen} onOpenChange={setIsAddCompanyOpen} />
     </header>
   );
 };
