@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 
 const Footer = () => {
@@ -9,8 +10,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <div className="flex items-center space-x-2 text-xl font-medium mb-4">
-              <span className="bg-primary text-primary-foreground px-2 py-1 rounded">Shadow</span>
-              <span>Stats</span>
+              <span className="bg-primary text-primary-foreground px-2 py-1 rounded">Insider</span>
+              <span>Edge</span>
             </div>
             <p className="text-sm text-muted-foreground">
               Connect with insider knowledge for smarter investment decisions.
@@ -57,7 +58,7 @@ const Footer = () => {
         
         <div className="mt-8 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-muted-foreground">
-            &copy; {currentYear} ShadowStats. All rights reserved.
+            &copy; {currentYear} InsiderEdge. All rights reserved.
           </p>
           <p className="text-xs text-muted-foreground mt-2 md:mt-0">
             Information shared is not financial advice and may be subject to securities laws.
