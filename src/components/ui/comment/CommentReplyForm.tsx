@@ -1,14 +1,24 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 type CommentReplyFormProps = {
   onSubmit: (content: string) => void;
   onCancel: () => void;
+  replyingTo?: string | null;
 };
 
-const CommentReplyForm = ({ onSubmit, onCancel }: CommentReplyFormProps) => {
+const CommentReplyForm = ({ onSubmit, onCancel, replyingTo }: CommentReplyFormProps) => {
   const [replyContent, setReplyContent] = useState("");
+  
+  // Initialize content with @username if replying to someone
+  useEffect(() => {
+    if (replyingTo) {
+      setReplyContent(`@${replyingTo} `);
+    } else {
+      setReplyContent("");
+    }
+  }, [replyingTo]);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,6 +31,11 @@ const CommentReplyForm = ({ onSubmit, onCancel }: CommentReplyFormProps) => {
   return (
     <div className="mt-3">
       <form onSubmit={handleSubmit}>
+        {replyingTo && (
+          <div className="mb-2 text-xs text-primary">
+            Replying to @{replyingTo}
+          </div>
+        )}
         <textarea
           value={replyContent}
           onChange={(e) => setReplyContent(e.target.value)}

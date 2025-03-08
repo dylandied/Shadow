@@ -9,6 +9,16 @@ import CommentActions from "./comment/CommentActions";
 import CommentReplyForm from "./comment/CommentReplyForm";
 import CommentReplies from "./comment/CommentReplies";
 
+// Define Reply type for comment replies
+export type Reply = {
+  id: string;
+  username: string;
+  content: string;
+  timestamp: Date;
+  upvotes: number;
+  downvotes: number;
+};
+
 type CommentProps = {
   id: string;
   username: string;
@@ -19,7 +29,7 @@ type CommentProps = {
   downvotes: number;
   timestamp: Date;
   replyTo?: string;
-  replies?: string[];
+  replies?: Reply[];
   userReputation?: "trusted" | "new";
   className?: string;
 };
@@ -42,7 +52,7 @@ const Comment = ({
   const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
   const [localUpvotes, setLocalUpvotes] = useState(upvotes);
   const [localDownvotes, setLocalDownvotes] = useState(downvotes);
-  const [localReplies, setLocalReplies] = useState<string[]>(replies);
+  const [localReplies, setLocalReplies] = useState<Reply[]>(replies);
   const [lastReplyTime, setLastReplyTime] = useState<Date | null>(null);
   
   const handleUpvote = () => {
@@ -87,7 +97,16 @@ const Comment = ({
     }
     
     // In a real app, this would make an API call to save the reply
-    setLocalReplies([...localReplies, replyContent]);
+    const newReply: Reply = {
+      id: `reply-${Date.now()}`,
+      username: "CurrentUser", // In a real app, this would be the logged-in user
+      content: replyContent,
+      timestamp: now,
+      upvotes: 0,
+      downvotes: 0
+    };
+    
+    setLocalReplies([...localReplies, newReply]);
     setLastReplyTime(now);
     
     toast({
@@ -96,6 +115,40 @@ const Comment = ({
     });
     
     setIsReplying(false);
+  };
+
+  const handleAddNestedReply = (content: string, mentionedUser?: string) => {
+    const now = new Date();
+    const fiveMinutesInMs = 5 * 60 * 1000;
+    
+    // Check if user has replied in the last 5 minutes
+    if (lastReplyTime && now.getTime() - lastReplyTime.getTime() < fiveMinutesInMs) {
+      const timeLeft = Math.ceil((fiveMinutesInMs - (now.getTime() - lastReplyTime.getTime())) / 60000);
+      toast({
+        title: "Reply limit reached",
+        description: `You can reply again in ${timeLeft} minute${timeLeft > 1 ? 's' : ''}.`,
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Create a new reply
+    const newReply: Reply = {
+      id: `reply-${Date.now()}`,
+      username: "CurrentUser", // In a real app, this would be the logged-in user
+      content: content,
+      timestamp: now,
+      upvotes: 0,
+      downvotes: 0
+    };
+    
+    setLocalReplies([...localReplies, newReply]);
+    setLastReplyTime(now);
+    
+    toast({
+      title: "Reply submitted",
+      description: "Your reply has been posted.",
+    });
   };
   
   return (
@@ -137,7 +190,11 @@ const Comment = ({
         />
       )}
       
-      <CommentReplies replies={localReplies} />
+      <CommentReplies
+        replies={localReplies}
+        onAddReply={handleAddNestedReply}
+        commentId={id}
+      />
     </motion.div>
   );
 };
