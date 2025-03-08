@@ -1,17 +1,28 @@
 
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import CommentHeader from "./comment/CommentHeader";
 import CommentBody from "./comment/CommentBody";
 import CommentActions from "./comment/CommentActions";
 import CommentReplyForm from "./comment/CommentReplyForm";
-import CommentReplies, { Reply } from "./comment/CommentReplies";
-import { CommentProps } from "./comment/types";
-import { useCommentVote } from "@/hooks/use-comment-vote";
-import { useCommentReplies } from "@/hooks/use-comment-replies";
+import CommentReplies from "./comment/CommentReplies";
 
-// Re-export Reply type for use in other components
-export type { Reply };
+type CommentProps = {
+  id: string;
+  username: string;
+  content: string;
+  bitcoinAddress?: string;
+  isEmployee: boolean;
+  upvotes: number;
+  downvotes: number;
+  timestamp: Date;
+  replyTo?: string;
+  replies?: string[];
+  userReputation?: "trusted" | "new";
+  className?: string;
+};
 
 const Comment = ({
   id,
@@ -22,20 +33,70 @@ const Comment = ({
   upvotes,
   downvotes,
   timestamp,
+  replyTo,
   replies = [],
   userReputation,
   className,
 }: CommentProps) => {
-  const { userVote, upvotes: localUpvotes, downvotes: localDownvotes, handleUpvote, handleDownvote } = 
-    useCommentVote({ initialUpvotes: upvotes, initialDownvotes: downvotes });
+  const [isReplying, setIsReplying] = useState(false);
+  const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
+  const [localUpvotes, setLocalUpvotes] = useState(upvotes);
+  const [localDownvotes, setLocalDownvotes] = useState(downvotes);
+  const [localReplies, setLocalReplies] = useState<string[]>(replies);
+  const [lastReplyTime, setLastReplyTime] = useState<Date | null>(null);
   
-  const { 
-    replies: localReplies, 
-    isReplying, 
-    setIsReplying, 
-    handleSubmitReply, 
-    handleAddNestedReply 
-  } = useCommentReplies({ initialReplies: replies });
+  const handleUpvote = () => {
+    if (userVote === "up") {
+      setUserVote(null);
+      setLocalUpvotes(prev => prev - 1);
+    } else {
+      if (userVote === "down") {
+        setLocalDownvotes(prev => prev - 1);
+      }
+      setUserVote("up");
+      setLocalUpvotes(prev => prev + 1);
+    }
+  };
+  
+  const handleDownvote = () => {
+    if (userVote === "down") {
+      setUserVote(null);
+      setLocalDownvotes(prev => prev - 1);
+    } else {
+      if (userVote === "up") {
+        setLocalUpvotes(prev => prev - 1);
+      }
+      setUserVote("down");
+      setLocalDownvotes(prev => prev + 1);
+    }
+  };
+  
+  const handleSubmitReply = (replyContent: string) => {
+    const now = new Date();
+    const fiveMinutesInMs = 5 * 60 * 1000;
+    
+    // Check if user has replied in the last 5 minutes
+    if (lastReplyTime && now.getTime() - lastReplyTime.getTime() < fiveMinutesInMs) {
+      const timeLeft = Math.ceil((fiveMinutesInMs - (now.getTime() - lastReplyTime.getTime())) / 60000);
+      toast({
+        title: "Reply limit reached",
+        description: `You can reply again in ${timeLeft} minute${timeLeft > 1 ? 's' : ''}.`,
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // In a real app, this would make an API call to save the reply
+    setLocalReplies([...localReplies, replyContent]);
+    setLastReplyTime(now);
+    
+    toast({
+      title: "Reply submitted",
+      description: "Your reply has been posted.",
+    });
+    
+    setIsReplying(false);
+  };
   
   return (
     <motion.div
@@ -76,11 +137,7 @@ const Comment = ({
         />
       )}
       
-      <CommentReplies
-        replies={localReplies}
-        onAddReply={handleAddNestedReply}
-        commentId={id}
-      />
+      <CommentReplies replies={localReplies} />
     </motion.div>
   );
 };

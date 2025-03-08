@@ -1,21 +1,8 @@
 
-import Comment, { Reply } from "@/components/ui/Comment";
-
-type Comment = {
-  id: string;
-  username: string;
-  content: string;
-  bitcoinAddress?: string;
-  isEmployee: boolean;
-  upvotes: number;
-  downvotes: number;
-  timestamp: Date;
-  replies: Reply[];
-  userReputation?: "trusted" | "new";
-};
+import Comment from "@/components/ui/Comment";
 
 type CommentsListProps = {
-  comments: Comment[];
+  comments: any[];
 };
 
 const CommentsList = ({ comments }: CommentsListProps) => {
