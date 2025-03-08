@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { ArrowUp, ArrowDown, Reply } from "lucide-react";
@@ -6,19 +5,13 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import CommentReplyForm from "./CommentReplyForm";
+import { Reply as ReplyType } from "./types";
 
-// Define Reply type for better structure
-export type Reply = {
-  id: string;
-  username: string;
-  content: string;
-  timestamp: Date;
-  upvotes: number;
-  downvotes: number;
-};
+// Re-export Reply type
+export type { ReplyType as Reply };
 
 type CommentRepliesProps = {
-  replies: Reply[];
+  replies: ReplyType[];
   onAddReply: (content: string, mentionedUser?: string) => void;
   commentId: string;
   className?: string;
