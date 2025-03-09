@@ -1,5 +1,5 @@
 
-import { TrendingUp, TrendingDown, SmileIcon, FrownIcon } from "lucide-react";
+import { TrendingUp, TrendingDown, SmileIcon, FrownIcon, ThumbsUp, ThumbsDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type ChangeDirection = "up" | "down" | "neutral";
@@ -34,13 +34,25 @@ const TrendIndicator = ({ change, showLabel = true, type }: TrendIndicatorProps)
   
   const { textColor } = getTrendStyles(change);
   
-  // If it's a news type insight, use smiling/frowning faces instead of arrows
+  // For satisfaction, use thumbs up/down
+  if (type === "satisfaction") {
+    return (
+      <div className={cn("flex items-center space-x-1", textColor)}>
+        {change === "up" ? <ThumbsUp className="h-4 w-4" /> : <ThumbsDown className="h-4 w-4" />}
+        {showLabel && (
+          <span className="text-xs font-medium">{change === "up" ? "Good" : "Bad"}</span>
+        )}
+      </div>
+    );
+  }
+  
+  // If it's a news type insight, use smiling/frowning faces with Good/Bad text
   if (type === "news") {
     return (
       <div className={cn("flex items-center space-x-1", textColor)}>
         {change === "up" ? <SmileIcon className="h-4 w-4" /> : <FrownIcon className="h-4 w-4" />}
         {showLabel && (
-          <span className="text-xs font-medium">{change === "up" ? "Positive" : "Negative"}</span>
+          <span className="text-xs font-medium">{change === "up" ? "Good" : "Bad"}</span>
         )}
       </div>
     );

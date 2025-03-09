@@ -38,7 +38,7 @@ const InsightsSection = () => {
           type="satisfaction"
           title="Employee Satisfaction"
           value="3.8/5"
-          change="neutral"
+          change="up"
           sourcesCount={8}
           lastUpdated="5 days ago"
         />
@@ -48,7 +48,7 @@ const InsightsSection = () => {
         <InsightCard
           type="news"
           title="Upcoming News"
-          value="Positive"
+          value="Good"
           change="up"
           sourcesCount={4}
           lastUpdated="3 hours ago"
