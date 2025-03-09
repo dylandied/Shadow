@@ -6,8 +6,6 @@ import { cn } from "@/lib/utils";
 import CommentHeader from "./comment/CommentHeader";
 import CommentBody from "./comment/CommentBody";
 import CommentActions from "./comment/CommentActions";
-import CommentReplyForm from "./comment/CommentReplyForm";
-import CommentReplies from "./comment/CommentReplies";
 
 type CommentProps = {
   id: string;
@@ -34,11 +32,9 @@ const Comment = ({
   downvotes,
   timestamp,
   replyTo,
-  replies = [],
   userReputation,
   className,
 }: CommentProps) => {
-  const [isReplying, setIsReplying] = useState(false);
   const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
   const [localUpvotes, setLocalUpvotes] = useState(upvotes);
   const [localDownvotes, setLocalDownvotes] = useState(downvotes);
@@ -67,15 +63,6 @@ const Comment = ({
       setUserVote("down");
       setLocalDownvotes(prev => prev + 1);
     }
-  };
-  
-  const handleSubmitReply = (replyContent: string) => {
-    // In a real application, this would make an API call to save the reply
-    toast({
-      title: "Reply submitted",
-      description: "Your reply has been posted.",
-    });
-    setIsReplying(false);
   };
   
   return (
@@ -107,17 +94,7 @@ const Comment = ({
         userVote={userVote}
         onUpvote={handleUpvote}
         onDownvote={handleDownvote}
-        onReply={() => setIsReplying(!isReplying)}
       />
-      
-      {isReplying && (
-        <CommentReplyForm 
-          onSubmit={handleSubmitReply}
-          onCancel={() => setIsReplying(false)}
-        />
-      )}
-      
-      <CommentReplies replies={replies} />
     </motion.div>
   );
 };

@@ -1,5 +1,5 @@
 
-import { ArrowUp, ArrowDown, Reply } from "lucide-react";
+import { ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import TipButton from "../TipButton";
 import { cn } from "@/lib/utils";
@@ -12,7 +12,6 @@ type CommentActionsProps = {
   userVote: "up" | "down" | null;
   onUpvote: () => void;
   onDownvote: () => void;
-  onReply: () => void;
   className?: string;
 };
 
@@ -24,7 +23,6 @@ const CommentActions = ({
   userVote,
   onUpvote,
   onDownvote,
-  onReply,
   className,
 }: CommentActionsProps) => {
   return (
@@ -54,16 +52,6 @@ const CommentActions = ({
         >
           <ArrowDown className="h-3 w-3 mr-1" />
           <span>{downvotes}</span>
-        </Button>
-        
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 px-2 text-xs text-muted-foreground"
-          onClick={onReply}
-        >
-          <Reply className="h-3 w-3 mr-1" />
-          <span className="hidden xs:inline">Reply</span>
         </Button>
       </div>
       

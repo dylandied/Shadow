@@ -16,6 +16,9 @@ const Company = () => {
   const [comments, setComments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState("recent");
+  // For demo purposes, simulate whether user is an employee
+  const [isEmployee, setIsEmployee] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
   
   useEffect(() => {
     // Simulate data fetching
@@ -28,6 +31,10 @@ const Company = () => {
       
       // Sort comments based on selected option
       sortComments(companyComments, sortBy);
+      
+      // For demo, randomly decide if the user is signed in and an employee
+      setIsSignedIn(Math.random() > 0.5);
+      setIsEmployee(Math.random() > 0.7);
       
       setLoading(false);
     }, 500);
@@ -78,6 +85,8 @@ const Company = () => {
         sortBy={sortBy}
         onSortChange={handleSortChange}
         onSubmitComment={handleSubmitComment}
+        isEmployee={isEmployee}
+        isSignedIn={isSignedIn}
       />
     </div>
   );

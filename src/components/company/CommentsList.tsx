@@ -20,7 +20,6 @@ const CommentsList = ({ comments }: CommentsListProps) => {
             upvotes={comment.upvotes}
             downvotes={comment.downvotes}
             timestamp={comment.timestamp}
-            replies={comment.replies}
             userReputation={comment.userReputation}
           />
         ))
