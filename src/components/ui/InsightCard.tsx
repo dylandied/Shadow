@@ -32,7 +32,7 @@ const InsightCard = ({
         {/* Card Header */}
         <div className="flex justify-between items-start mb-3">
           <InsightIcon type={type} change={change} />
-          <TrendIndicator change={change} />
+          <TrendIndicator change={change} type={type} />
         </div>
         
         {/* Card Content */}

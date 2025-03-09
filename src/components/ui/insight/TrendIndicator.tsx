@@ -1,5 +1,5 @@
 
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, SmileIcon, FrownIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type ChangeDirection = "up" | "down" | "neutral";
@@ -7,6 +7,7 @@ export type ChangeDirection = "up" | "down" | "neutral";
 type TrendIndicatorProps = {
   change: ChangeDirection;
   showLabel?: boolean;
+  type?: "sales" | "traffic" | "satisfaction" | "news";
 };
 
 export const getTrendStyles = (change: ChangeDirection) => {
@@ -28,11 +29,24 @@ export const getTrendStyles = (change: ChangeDirection) => {
   };
 };
 
-const TrendIndicator = ({ change, showLabel = true }: TrendIndicatorProps) => {
+const TrendIndicator = ({ change, showLabel = true, type }: TrendIndicatorProps) => {
   if (change === "neutral") return null;
   
   const { textColor } = getTrendStyles(change);
   
+  // If it's a news type insight, use smiling/frowning faces instead of arrows
+  if (type === "news") {
+    return (
+      <div className={cn("flex items-center space-x-1", textColor)}>
+        {change === "up" ? <SmileIcon className="h-4 w-4" /> : <FrownIcon className="h-4 w-4" />}
+        {showLabel && (
+          <span className="text-xs font-medium">{change === "up" ? "Positive" : "Negative"}</span>
+        )}
+      </div>
+    );
+  }
+  
+  // Default trend arrows for other insight types
   return (
     <div className={cn("flex items-center space-x-1", textColor)}>
       {change === "up" ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
