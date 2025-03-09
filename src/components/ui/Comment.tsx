@@ -42,8 +42,6 @@ const Comment = ({
   const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
   const [localUpvotes, setLocalUpvotes] = useState(upvotes);
   const [localDownvotes, setLocalDownvotes] = useState(downvotes);
-  const [localReplies, setLocalReplies] = useState<string[]>(replies);
-  const [lastReplyTime, setLastReplyTime] = useState<Date | null>(null);
   
   const handleUpvote = () => {
     if (userVote === "up") {
@@ -72,29 +70,11 @@ const Comment = ({
   };
   
   const handleSubmitReply = (replyContent: string) => {
-    const now = new Date();
-    const fiveMinutesInMs = 5 * 60 * 1000;
-    
-    // Check if user has replied in the last 5 minutes
-    if (lastReplyTime && now.getTime() - lastReplyTime.getTime() < fiveMinutesInMs) {
-      const timeLeft = Math.ceil((fiveMinutesInMs - (now.getTime() - lastReplyTime.getTime())) / 60000);
-      toast({
-        title: "Reply limit reached",
-        description: `You can reply again in ${timeLeft} minute${timeLeft > 1 ? 's' : ''}.`,
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    // In a real app, this would make an API call to save the reply
-    setLocalReplies([...localReplies, replyContent]);
-    setLastReplyTime(now);
-    
+    // In a real application, this would make an API call to save the reply
     toast({
       title: "Reply submitted",
       description: "Your reply has been posted.",
     });
-    
     setIsReplying(false);
   };
   
@@ -137,7 +117,7 @@ const Comment = ({
         />
       )}
       
-      <CommentReplies replies={localReplies} />
+      <CommentReplies replies={replies} />
     </motion.div>
   );
 };

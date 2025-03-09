@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Search, ArrowRight } from "lucide-react";
+import { Search, Filter, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
@@ -66,7 +66,7 @@ const Home = () => {
         >
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
             Inside Knowledge,{" "}
-            <span className="text-primary">Better Decisions</span>
+            <span className="text-insight-neutral">Better Decisions</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
             Connect with employees for valuable insights before they become official.
@@ -111,6 +111,10 @@ const Home = () => {
             >
               New Activity
             </Button>
+            <Button variant="outline" size="sm">
+              <Filter className="h-4 w-4 mr-1" />
+              <span className="hidden sm:inline">More Filters</span>
+            </Button>
           </div>
         </div>
         
@@ -122,7 +126,7 @@ const Home = () => {
         >
           {companies.map((company) => (
             <motion.div key={company.id} variants={itemVariants}>
-              <Card className="overflow-hidden hover:shadow-md transition-shadow border-border/50">
+              <Card className="overflow-hidden hover:shadow-md transition-shadow">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">
                     <div className="flex items-center">
@@ -133,7 +137,7 @@ const Home = () => {
                           className="w-8 h-8 mr-3 rounded-full"
                         />
                       ) : (
-                        <div className="w-8 h-8 mr-3 rounded-full bg-accent/20 flex items-center justify-center text-sm font-medium">
+                        <div className="w-8 h-8 mr-3 rounded-full bg-accent flex items-center justify-center text-sm font-medium">
                           {company.name.charAt(0)}
                         </div>
                       )}
@@ -155,14 +159,14 @@ const Home = () => {
                     {company.description}
                   </p>
                 </CardContent>
-                <CardFooter className="flex justify-between pt-2 border-t border-border/30">
+                <CardFooter className="flex justify-between pt-2 border-t">
                   <div className="text-xs text-muted-foreground">
                     {company.insidersCount} {company.insidersCount === 1 ? "insider" : "insiders"}
                     <span className="mx-2">•</span>
                     {company.postsCount} {company.postsCount === 1 ? "post" : "posts"}
                   </div>
                   <Link to={`/company/${company.id}`}>
-                    <Button variant="ghost" size="sm" className="hover-lift text-primary">
+                    <Button variant="ghost" size="sm" className="hover-lift">
                       <span>View</span>
                       <ArrowRight className="ml-1 h-4 w-4" />
                     </Button>

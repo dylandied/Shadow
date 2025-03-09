@@ -9,7 +9,6 @@ import InsightsSection from "@/components/company/InsightsSection";
 import DiscussionSection from "@/components/company/DiscussionSection";
 import LoadingState from "@/components/company/LoadingState";
 import NotFoundState from "@/components/company/NotFoundState";
-import { toast } from "@/hooks/use-toast";
 
 const Company = () => {
   const { id } = useParams<{ id: string }>();
@@ -38,26 +37,16 @@ const Company = () => {
     let sorted;
     switch (sortOption) {
       case "upvoted":
-        // First sort by upvotes, then by recency
-        sorted = [...commentsToSort].sort((a, b) => {
-          const upvoteDiff = b.upvotes - a.upvotes;
-          if (upvoteDiff !== 0) return upvoteDiff;
-          return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-        });
+        sorted = [...commentsToSort].sort((a, b) => b.upvotes - a.upvotes);
         break;
       case "recent":
-        sorted = [...commentsToSort].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        sorted = [...commentsToSort].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
         break;
       case "tipped":
-        // First sort by tipAmount, then by recency
-        sorted = [...commentsToSort].sort((a, b) => {
-          const tipDiff = b.tipAmount - a.tipAmount;
-          if (tipDiff !== 0) return tipDiff;
-          return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-        });
+        sorted = [...commentsToSort].sort((a, b) => b.tipAmount - a.tipAmount);
         break;
       default:
-        sorted = [...commentsToSort].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        sorted = commentsToSort;
     }
     setComments(sorted);
   };
@@ -70,29 +59,6 @@ const Company = () => {
   const handleSubmitComment = (content: string) => {
     // In a real application, this would make an API call to save the comment
     console.log("New comment:", content);
-    
-    // Simulate adding a new comment
-    const newComment = {
-      id: `comment${comments.length + 1}`,
-      companyId: id,
-      username: "CurrentUser",
-      content: content,
-      isEmployee: false,
-      upvotes: 0,
-      downvotes: 0,
-      tipAmount: 0,
-      timestamp: new Date(),
-      replies: [],
-    };
-    
-    // Add the new comment and resort
-    const updatedComments = [...comments, newComment];
-    sortComments(updatedComments, sortBy);
-    
-    toast({
-      title: "Comment submitted",
-      description: "Your comment has been posted.",
-    });
   };
   
   if (loading) {

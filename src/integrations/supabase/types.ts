@@ -9,147 +9,16 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      comments: {
-        Row: {
-          company_id: string | null
-          content: string
-          created_at: string | null
-          downvotes: number | null
-          id: string
-          upvotes: number | null
-          user_id: string | null
-        }
-        Insert: {
-          company_id?: string | null
-          content: string
-          created_at?: string | null
-          downvotes?: number | null
-          id?: string
-          upvotes?: number | null
-          user_id?: string | null
-        }
-        Update: {
-          company_id?: string | null
-          content?: string
-          created_at?: string | null
-          downvotes?: number | null
-          id?: string
-          upvotes?: number | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "comments_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      companies: {
-        Row: {
-          id: string
-          industry: string | null
-          logo_url: string | null
-          name: string
-          status: string | null
-          submitted_at: string | null
-          submitted_by: string | null
-          ticker: string
-        }
-        Insert: {
-          id?: string
-          industry?: string | null
-          logo_url?: string | null
-          name: string
-          status?: string | null
-          submitted_at?: string | null
-          submitted_by?: string | null
-          ticker: string
-        }
-        Update: {
-          id?: string
-          industry?: string | null
-          logo_url?: string | null
-          name?: string
-          status?: string | null
-          submitted_at?: string | null
-          submitted_by?: string | null
-          ticker?: string
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          banned: boolean | null
-          created_at: string | null
-          id: string
-          role: Database["public"]["Enums"]["user_role"]
-          username: string
-        }
-        Insert: {
-          banned?: boolean | null
-          created_at?: string | null
-          id: string
-          role?: Database["public"]["Enums"]["user_role"]
-          username: string
-        }
-        Update: {
-          banned?: boolean | null
-          created_at?: string | null
-          id?: string
-          role?: Database["public"]["Enums"]["user_role"]
-          username?: string
-        }
-        Relationships: []
-      }
-      replies: {
-        Row: {
-          comment_id: string | null
-          content: string
-          created_at: string | null
-          id: string
-          user_id: string | null
-        }
-        Insert: {
-          comment_id?: string | null
-          content: string
-          created_at?: string | null
-          id?: string
-          user_id?: string | null
-        }
-        Update: {
-          comment_id?: string | null
-          content?: string
-          created_at?: string | null
-          id?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "replies_comment_id_fkey"
-            columns: ["comment_id"]
-            isOneToOne: false
-            referencedRelation: "comments"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      ban_user: {
-        Args: {
-          user_id_to_ban: string
-        }
-        Returns: undefined
-      }
+      [_ in never]: never
     }
     Enums: {
-      user_role: "user" | "admin"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
