@@ -1,7 +1,8 @@
 
-// Mock data for development
+import { Company, Comment } from "@/types";
 
-export const mockCompanies = [
+// Mock data for development
+export const mockCompanies: Company[] = [
   {
     id: "aapl",
     name: "Apple Inc.",
@@ -88,7 +89,7 @@ export const mockCompanies = [
   }
 ];
 
-export const mockComments = [
+export const mockComments: Comment[] = [
   {
     id: "comment1",
     companyId: "aapl",

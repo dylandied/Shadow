@@ -71,13 +71,8 @@ const Company = () => {
   
   return (
     <div className="container mx-auto px-3 sm:px-4 pt-20 sm:pt-24 pb-16">
-      {/* Company Header */}
       <CompanyHeader company={company} />
-      
-      {/* Insight Cards */}
       <InsightsSection />
-      
-      {/* Comments Section */}
       <DiscussionSection 
         comments={comments}
         sortBy={sortBy}

@@ -29,16 +29,13 @@ const DiscussionSection = ({
         </TabsList>
         
         <TabsContent value="discussions">
-          {/* Sorting Options */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-3">
             <h3 className="text-lg sm:text-xl font-bold">Insider Insights</h3>
             <CommentSorter sortBy={sortBy} onSortChange={onSortChange} />
           </div>
           
-          {/* Add Comment Form */}
           <CommentForm onSubmit={onSubmitComment} />
           
-          {/* Comments List */}
           <CommentsList comments={comments} />
         </TabsContent>
       </Tabs>
