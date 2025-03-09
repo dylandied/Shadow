@@ -18,7 +18,7 @@ const Footer = () => {
             </p>
           </div>
           
-          <div className="md:justify-self-end">
+          <div className="md:justify-self-center">
             <h3 className="font-medium mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
