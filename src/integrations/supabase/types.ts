@@ -121,23 +121,32 @@ export type Database = {
       profiles: {
         Row: {
           banned: boolean | null
+          bitcoin_address: string | null
           created_at: string | null
           id: string
+          is_employee: boolean | null
           role: Database["public"]["Enums"]["user_role"]
+          user_type: string | null
           username: string
         }
         Insert: {
           banned?: boolean | null
+          bitcoin_address?: string | null
           created_at?: string | null
           id: string
+          is_employee?: boolean | null
           role?: Database["public"]["Enums"]["user_role"]
+          user_type?: string | null
           username: string
         }
         Update: {
           banned?: boolean | null
+          bitcoin_address?: string | null
           created_at?: string | null
           id?: string
+          is_employee?: boolean | null
           role?: Database["public"]["Enums"]["user_role"]
+          user_type?: string | null
           username?: string
         }
         Relationships: []
