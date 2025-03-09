@@ -20,6 +20,7 @@ type CommentProps = {
   replies?: string[];
   userReputation?: "trusted" | "new";
   className?: string;
+  isSignedIn?: boolean;
 };
 
 const Comment = ({
@@ -34,16 +35,28 @@ const Comment = ({
   replyTo,
   userReputation,
   className,
+  isSignedIn = false,
 }: CommentProps) => {
   const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
   const [localUpvotes, setLocalUpvotes] = useState(upvotes);
   const [localDownvotes, setLocalDownvotes] = useState(downvotes);
   
   const handleUpvote = () => {
+    if (!isSignedIn) {
+      toast({
+        title: "Sign in required",
+        description: "You need to sign in to vote on comments.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (userVote === "up") {
+      // Removing existing upvote
       setUserVote(null);
       setLocalUpvotes(prev => prev - 1);
     } else {
+      // Adding upvote (and removing downvote if exists)
       if (userVote === "down") {
         setLocalDownvotes(prev => prev - 1);
       }
@@ -53,10 +66,21 @@ const Comment = ({
   };
   
   const handleDownvote = () => {
+    if (!isSignedIn) {
+      toast({
+        title: "Sign in required",
+        description: "You need to sign in to vote on comments.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (userVote === "down") {
+      // Removing existing downvote
       setUserVote(null);
       setLocalDownvotes(prev => prev - 1);
     } else {
+      // Adding downvote (and removing upvote if exists)
       if (userVote === "up") {
         setLocalUpvotes(prev => prev - 1);
       }
@@ -94,6 +118,7 @@ const Comment = ({
         userVote={userVote}
         onUpvote={handleUpvote}
         onDownvote={handleDownvote}
+        isSignedIn={isSignedIn}
       />
     </motion.div>
   );

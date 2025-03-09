@@ -13,6 +13,7 @@ type CommentActionsProps = {
   onUpvote: () => void;
   onDownvote: () => void;
   className?: string;
+  isSignedIn?: boolean;
 };
 
 const CommentActions = ({
@@ -24,6 +25,7 @@ const CommentActions = ({
   onUpvote,
   onDownvote,
   className,
+  isSignedIn = false,
 }: CommentActionsProps) => {
   return (
     <div className={cn("mt-2 sm:mt-3 flex flex-wrap items-center justify-between gap-y-2", className)}>
@@ -36,6 +38,7 @@ const CommentActions = ({
             userVote === "up" ? "text-insight-positive" : "text-muted-foreground"
           )}
           onClick={onUpvote}
+          title={!isSignedIn ? "Sign in to vote" : undefined}
         >
           <ArrowUp className="h-3 w-3 mr-1" />
           <span>{upvotes}</span>
@@ -49,6 +52,7 @@ const CommentActions = ({
             userVote === "down" ? "text-insight-negative" : "text-muted-foreground"
           )}
           onClick={onDownvote}
+          title={!isSignedIn ? "Sign in to vote" : undefined}
         >
           <ArrowDown className="h-3 w-3 mr-1" />
           <span>{downvotes}</span>

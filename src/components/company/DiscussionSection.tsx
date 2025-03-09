@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import CommentSorter from "./CommentSorter";
 import CommentForm from "./CommentForm";
@@ -77,7 +76,7 @@ const DiscussionSection = ({
         )
       )}
       
-      <CommentsList comments={comments} />
+      <CommentsList comments={comments} isSignedIn={isSignedIn} />
     </div>
   );
 };

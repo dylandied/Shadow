@@ -3,9 +3,10 @@ import Comment from "@/components/ui/Comment";
 
 type CommentsListProps = {
   comments: any[];
+  isSignedIn?: boolean;
 };
 
-const CommentsList = ({ comments }: CommentsListProps) => {
+const CommentsList = ({ comments, isSignedIn = false }: CommentsListProps) => {
   return (
     <div className="space-y-3 sm:space-y-4">
       {comments.length > 0 ? (
@@ -21,6 +22,7 @@ const CommentsList = ({ comments }: CommentsListProps) => {
             downvotes={comment.downvotes}
             timestamp={comment.timestamp}
             userReputation={comment.userReputation}
+            isSignedIn={isSignedIn}
           />
         ))
       ) : (
