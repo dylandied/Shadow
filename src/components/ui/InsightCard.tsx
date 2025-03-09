@@ -18,6 +18,7 @@ type InsightCardProps = {
   companyId?: string;
   isEmployee?: boolean;
   isSignedIn?: boolean;
+  userCompanyId?: string | null;
 };
 
 const InsightCard = ({
@@ -30,6 +31,7 @@ const InsightCard = ({
   companyId,
   isEmployee = false,
   isSignedIn = false,
+  userCompanyId = null,
 }: InsightCardProps) => {
   const {
     userVote,
@@ -37,7 +39,7 @@ const InsightCard = ({
     votesLoading,
     handleVote,
     getTimeUntilNextVote
-  } = useInsightVote(companyId, type, isSignedIn, isEmployee);
+  } = useInsightVote(companyId, type, isSignedIn, isEmployee, userCompanyId);
 
   return (
     <motion.div

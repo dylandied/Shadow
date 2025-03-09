@@ -1,113 +1,81 @@
 
-import { motion } from "framer-motion";
-import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import InsightCard from "@/components/ui/InsightCard";
-import { containerVariants, itemVariants } from "@/utils/animationVariants";
+import { useState, useEffect } from "react";
+import { InsightCard } from "@/components/ui";
+import { mockInsights } from "@/data/mockData";
 
 type InsightsSectionProps = {
-  companyId?: string;
+  companyId: string;
   isEmployee?: boolean;
   isSignedIn?: boolean;
+  userCompanyId?: string | null;
 };
 
-const InsightsSection = ({
-  companyId,
-  isEmployee = false,
+const InsightsSection = ({ 
+  companyId, 
+  isEmployee = false, 
   isSignedIn = false,
+  userCompanyId = null
 }: InsightsSectionProps) => {
-  // Set up real-time subscription for vote updates
+  const [insights, setInsights] = useState(mockInsights);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    if (!companyId) return;
-
-    // Subscribe to changes in the insight_votes table for this company
-    const channel = supabase
-      .channel('insight-votes-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*', // Listen for all changes (INSERT, UPDATE, DELETE)
-          schema: 'public',
-          table: 'insight_votes',
-          filter: `company_id=eq.${companyId}`
-        },
-        (payload) => {
-          // When a vote changes, we don't need to do anything specific here
-          // The InsightFooter component will re-fetch the vote count
-          console.log('Vote update:', payload);
-        }
-      )
-      .subscribe();
-
-    // Clean up subscription when component unmounts
-    return () => {
-      supabase.removeChannel(channel);
+    // Simulate data loading
+    const loadData = async () => {
+      setLoading(true);
+      // In a real app, we would fetch insights for this company
+      
+      // For demo, we'll just use the mock data with slight randomization
+      const randomizedInsights = mockInsights.map(insight => ({
+        ...insight,
+        value: insight.type === 'satisfaction' 
+          ? `${Math.floor(70 + Math.random() * 20)}%` 
+          : insight.value,
+        change: Math.random() > 0.6 ? 'up' : Math.random() > 0.3 ? 'down' : 'neutral'
+      }));
+      
+      setTimeout(() => {
+        setInsights(randomizedInsights);
+        setLoading(false);
+      }, 500);
     };
+    
+    loadData();
   }, [companyId]);
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-10"
-    >
-      <motion.div variants={itemVariants}>
-        <InsightCard
-          type="sales"
-          title="Sales Trends"
-          value="Up 10%"
-          change="up"
-          sourcesCount={5}
-          lastUpdated="2 hours ago"
-          companyId={companyId}
-          isEmployee={isEmployee}
-          isSignedIn={isSignedIn}
-        />
-      </motion.div>
+    <div className="my-8 sm:my-10">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Company Insights</h2>
       
-      <motion.div variants={itemVariants}>
-        <InsightCard
-          type="traffic"
-          title="Foot Traffic"
-          value="Moderate"
-          change="down"
-          sourcesCount={3}
-          lastUpdated="1 day ago"
-          companyId={companyId}
-          isEmployee={isEmployee}
-          isSignedIn={isSignedIn}
-        />
-      </motion.div>
-      
-      <motion.div variants={itemVariants}>
-        <InsightCard
-          type="satisfaction"
-          title="Employee Satisfaction"
-          value="3.8/5"
-          change="up"
-          sourcesCount={8}
-          lastUpdated="5 days ago"
-          companyId={companyId}
-          isEmployee={isEmployee}
-          isSignedIn={isSignedIn}
-        />
-      </motion.div>
-      
-      <motion.div variants={itemVariants}>
-        <InsightCard
-          type="news"
-          title="Upcoming News"
-          value="Positive"
-          change="up"
-          sourcesCount={4}
-          lastUpdated="3 hours ago"
-          companyId={companyId}
-          isEmployee={isEmployee}
-          isSignedIn={isSignedIn}
-        />
-      </motion.div>
-    </motion.div>
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <div 
+              key={i} 
+              className="h-56 rounded-xl bg-card/40 animate-pulse"
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          {insights.map((insight) => (
+            <InsightCard
+              key={insight.type}
+              type={insight.type}
+              title={insight.title}
+              value={insight.value}
+              change={insight.change}
+              sourcesCount={insight.sourcesCount}
+              lastUpdated={insight.lastUpdated}
+              companyId={companyId}
+              isEmployee={isEmployee}
+              isSignedIn={isSignedIn}
+              userCompanyId={userCompanyId}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

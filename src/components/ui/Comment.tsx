@@ -20,6 +20,9 @@ type CommentProps = {
   userReputation?: "trusted" | "new";
   className?: string;
   isSignedIn?: boolean;
+  companyId: string;
+  userIsEmployee?: boolean;
+  userCompanyId?: string | null;
 };
 
 const Comment = ({
@@ -35,6 +38,9 @@ const Comment = ({
   userReputation,
   className,
   isSignedIn = false,
+  companyId,
+  userIsEmployee = false,
+  userCompanyId = null,
 }: CommentProps) => {
   const { 
     userVote, 
@@ -46,7 +52,10 @@ const Comment = ({
     initialUpvotes: upvotes,
     initialDownvotes: downvotes,
     isSignedIn,
-    commentId: id
+    commentId: id,
+    companyId,
+    isEmployee: userIsEmployee,
+    userCompanyId
   });
   
   return (
