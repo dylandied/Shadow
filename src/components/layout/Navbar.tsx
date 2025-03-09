@@ -1,18 +1,18 @@
 
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Building, Plus, UserCircle } from "lucide-react";
+import { Menu, X, Building, Plus, UserCircle, ShieldAlert, LogIn, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AddCompanyDialog } from "@/components/ui/AddCompanyDialog";
-import { AuthDialog } from "@/components/ui/AuthDialog";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
   const location = useLocation();
+  const { isAdmin, user, logout } = useAuth();
   
   // Handle scroll effect
   useEffect(() => {
@@ -28,6 +28,10 @@ const Navbar = () => {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location]);
+  
+  const handleLogout = async () => {
+    await logout();
+  };
   
   return (
     <header 
@@ -69,15 +73,38 @@ const Navbar = () => {
               How It Works
             </Link>
             
+            {/* Admin Dashboard Link - Only visible to admins */}
+            {isAdmin && (
+              <Link 
+                to="/admin" 
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-primary flex items-center",
+                  location.pathname === "/admin" ? "text-primary" : "text-muted-foreground"
+                )}
+              >
+                <ShieldAlert className="h-4 w-4 mr-1" />
+                Admin
+              </Link>
+            )}
+            
             <Button variant="outline" size="sm" className="hover-lift" onClick={() => setIsAddCompanyOpen(true)}>
               <Plus className="h-4 w-4 mr-1" />
               <span>Add Company</span>
             </Button>
             
-            <Button variant="default" size="sm" onClick={() => setIsAuthOpen(true)}>
-              <UserCircle className="h-4 w-4 mr-1" />
-              <span>Sign In</span>
-            </Button>
+            {user ? (
+              <Button variant="default" size="sm" onClick={handleLogout}>
+                <LogOut className="h-4 w-4 mr-1" />
+                <span>Logout</span>
+              </Button>
+            ) : (
+              <Link to="/login">
+                <Button variant="default" size="sm">
+                  <LogIn className="h-4 w-4 mr-1" />
+                  <span>Login</span>
+                </Button>
+              </Link>
+            )}
           </nav>
           
           {/* Mobile Menu Button */}
@@ -121,6 +148,20 @@ const Navbar = () => {
               How It Works
             </Link>
             
+            {/* Admin Dashboard Link - Only visible to admins */}
+            {isAdmin && (
+              <Link 
+                to="/admin" 
+                className={cn(
+                  "px-3 py-2 rounded-md text-sm font-medium flex items-center",
+                  location.pathname === "/admin" ? "bg-primary/10 text-primary" : "text-muted-foreground"
+                )}
+              >
+                <ShieldAlert className="h-4 w-4 mr-2" />
+                Admin Dashboard
+              </Link>
+            )}
+            
             <Button
               variant="outline"
               size="sm"
@@ -134,27 +175,37 @@ const Navbar = () => {
               <span>Add Company</span>
             </Button>
             
-            <Button
-              variant="default"
-              size="sm"
-              className="w-full flex items-center justify-center"
-              onClick={() => {
-                setIsAuthOpen(true);
-                setIsMobileMenuOpen(false);
-              }}
-            >
-              <UserCircle className="h-4 w-4 mr-1" />
-              <span>Sign In</span>
-            </Button>
+            {user ? (
+              <Button
+                variant="default"
+                size="sm"
+                className="w-full flex items-center justify-center"
+                onClick={() => {
+                  handleLogout();
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                <LogOut className="h-4 w-4 mr-1" />
+                <span>Logout</span>
+              </Button>
+            ) : (
+              <Link to="/login" className="w-full" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="w-full flex items-center justify-center"
+                >
+                  <LogIn className="h-4 w-4 mr-1" />
+                  <span>Login</span>
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       )}
       
       {/* Add Company Dialog */}
       <AddCompanyDialog open={isAddCompanyOpen} onOpenChange={setIsAddCompanyOpen} />
-      
-      {/* Auth Dialog */}
-      <AuthDialog open={isAuthOpen} onOpenChange={setIsAuthOpen} />
     </header>
   );
 };

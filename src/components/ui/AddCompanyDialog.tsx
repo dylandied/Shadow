@@ -5,58 +5,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Building, Plus, AlertCircle } from "lucide-react";
-import { mockCompanies } from "@/data/mockData";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 type AddCompanyFormData = {
   name: string;
   ticker: string;
+  industry: string;
 };
 
 export function AddCompanyDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-  const [formData, setFormData] = useState<AddCompanyFormData>({ name: "", ticker: "" });
-  const [isValidating, setIsValidating] = useState(false);
+  const [formData, setFormData] = useState<AddCompanyFormData>({ 
+    name: "", 
+    ticker: "",
+    industry: ""
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setError(null);
-  };
-
-  const validateCompany = async (): Promise<boolean> => {
-    setIsValidating(true);
-    setError(null);
-
-    try {
-      // Check if company already exists in our mock data
-      if (mockCompanies.some(
-        company => 
-          company.ticker.toLowerCase() === formData.ticker.toLowerCase() ||
-          company.name.toLowerCase() === formData.name.toLowerCase()
-      )) {
-        setError("This company is already in our database.");
-        return false;
-      }
-
-      // Simulate API check for valid publicly traded company
-      // In a real app, this would call an API to validate the ticker
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // For demo purposes, reject some fake tickers
-      const invalidTickers = ["FAKE", "TEST", "INVALID"];
-      if (invalidTickers.includes(formData.ticker.toUpperCase())) {
-        setError("This does not appear to be a valid publicly traded company.");
-        return false;
-      }
-
-      return true;
-    } catch (err) {
-      setError("An error occurred during validation.");
-      return false;
-    } finally {
-      setIsValidating(false);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -66,19 +38,56 @@ export function AddCompanyDialog({ open, onOpenChange }: { open: boolean; onOpen
       setError("Company name and ticker symbol are required.");
       return;
     }
+
+    if (!user) {
+      setError("You must be logged in to submit a company.");
+      return;
+    }
     
-    const isValid = await validateCompany();
-    
-    if (isValid) {
-      // In a real app, this would add to the database
+    try {
+      setIsSubmitting(true);
+      setError(null);
+
+      // Check if company already exists
+      const { data: existingCompany, error: checkError } = await supabase
+        .from('companies')
+        .select('id')
+        .or(`name.ilike.${formData.name},ticker.ilike.${formData.ticker}`)
+        .limit(1);
+
+      if (checkError) throw checkError;
+
+      if (existingCompany && existingCompany.length > 0) {
+        setError("This company is already in our database.");
+        return;
+      }
+
+      // Submit new company
+      const { error: insertError } = await supabase
+        .from('companies')
+        .insert({
+          name: formData.name,
+          ticker: formData.ticker.toUpperCase(),
+          industry: formData.industry || null,
+          status: 'pending',
+          submitted_by: user.id
+        });
+
+      if (insertError) throw insertError;
+      
       toast({
         title: "Company submitted",
         description: `${formData.name} (${formData.ticker.toUpperCase()}) has been submitted for review.`,
       });
       
       // Reset form and close dialog
-      setFormData({ name: "", ticker: "" });
+      setFormData({ name: "", ticker: "", industry: "" });
       onOpenChange(false);
+    } catch (error: any) {
+      console.error("Error submitting company:", error);
+      setError(error.message || "An error occurred during submission.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -103,7 +112,7 @@ export function AddCompanyDialog({ open, onOpenChange }: { open: boolean; onOpen
               placeholder="e.g., Apple Inc."
               value={formData.name}
               onChange={handleInputChange}
-              disabled={isValidating}
+              disabled={isSubmitting}
             />
           </div>
           
@@ -117,7 +126,21 @@ export function AddCompanyDialog({ open, onOpenChange }: { open: boolean; onOpen
               placeholder="e.g., AAPL"
               value={formData.ticker}
               onChange={handleInputChange}
-              disabled={isValidating}
+              disabled={isSubmitting}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <label htmlFor="industry" className="text-sm font-medium">
+              Industry (Optional)
+            </label>
+            <Input
+              id="industry"
+              name="industry"
+              placeholder="e.g., Technology"
+              value={formData.industry}
+              onChange={handleInputChange}
+              disabled={isSubmitting}
             />
           </div>
           
@@ -128,17 +151,23 @@ export function AddCompanyDialog({ open, onOpenChange }: { open: boolean; onOpen
             </div>
           )}
           
+          {!user && (
+            <div className="bg-amber-500/10 text-amber-500 p-3 rounded-md text-sm">
+              You need to log in before submitting a company.
+            </div>
+          )}
+          
           <DialogFooter className="pt-4">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isValidating}
+              disabled={isSubmitting}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isValidating}>
-              {isValidating ? "Validating..." : "Submit Company"}
+            <Button type="submit" disabled={isSubmitting || !user}>
+              {isSubmitting ? "Submitting..." : "Submit Company"}
             </Button>
           </DialogFooter>
         </form>

@@ -1,15 +1,24 @@
 
+import { useAuth } from "@/contexts/AuthContext";
 import Comment from "@/components/ui/Comment";
+import { useState } from "react";
 
 type CommentsListProps = {
   comments: any[];
 };
 
-const CommentsList = ({ comments }: CommentsListProps) => {
+const CommentsList = ({ comments: initialComments }: CommentsListProps) => {
+  const [comments, setComments] = useState(initialComments);
+  const { isAdmin } = useAuth();
+
   // Sort comments by timestamp in descending order (newest first)
   const sortedComments = [...comments].sort((a, b) => 
     new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
   );
+
+  const handleCommentDeleted = (commentId: string) => {
+    setComments(prevComments => prevComments.filter(comment => comment.id !== commentId));
+  };
 
   return (
     <div className="space-y-3 sm:space-y-4">
@@ -19,6 +28,7 @@ const CommentsList = ({ comments }: CommentsListProps) => {
             key={comment.id}
             id={comment.id}
             username={comment.username}
+            userId={comment.userId}
             content={comment.content}
             bitcoinAddress={comment.isEmployee ? comment.bitcoinAddress : undefined}
             isEmployee={comment.isEmployee}
@@ -27,6 +37,7 @@ const CommentsList = ({ comments }: CommentsListProps) => {
             timestamp={comment.timestamp}
             replies={comment.replies}
             userReputation={comment.userReputation}
+            onCommentDeleted={() => handleCommentDeleted(comment.id)}
           />
         ))
       ) : (

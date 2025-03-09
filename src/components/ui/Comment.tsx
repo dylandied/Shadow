@@ -3,15 +3,18 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 import CommentHeader from "./comment/CommentHeader";
 import CommentBody from "./comment/CommentBody";
 import CommentActions from "./comment/CommentActions";
 import CommentReplyForm from "./comment/CommentReplyForm";
 import CommentReplies from "./comment/CommentReplies";
+import AdminCommentActions from "./comment/AdminCommentActions";
 
 type CommentProps = {
   id: string;
   username: string;
+  userId?: string;
   content: string;
   bitcoinAddress?: string;
   isEmployee: boolean;
@@ -22,11 +25,13 @@ type CommentProps = {
   replies?: string[];
   userReputation?: "trusted" | "new";
   className?: string;
+  onCommentDeleted?: () => void;
 };
 
 const Comment = ({
   id,
   username,
+  userId,
   content,
   bitcoinAddress,
   isEmployee,
@@ -37,6 +42,7 @@ const Comment = ({
   replies = [],
   userReputation,
   className,
+  onCommentDeleted,
 }: CommentProps) => {
   const [isReplying, setIsReplying] = useState(false);
   const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
@@ -44,6 +50,7 @@ const Comment = ({
   const [localDownvotes, setLocalDownvotes] = useState(downvotes);
   const [localReplies, setLocalReplies] = useState<string[]>(replies);
   const [lastReplyTime, setLastReplyTime] = useState<Date | null>(null);
+  const { isAdmin } = useAuth();
   
   const handleUpvote = () => {
     if (userVote === "up") {
@@ -98,6 +105,12 @@ const Comment = ({
     setIsReplying(false);
   };
   
+  const handleCommentDeleted = () => {
+    if (onCommentDeleted) {
+      onCommentDeleted();
+    }
+  };
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -111,6 +124,7 @@ const Comment = ({
     >
       <CommentHeader 
         username={username}
+        userId={userId}
         isEmployee={isEmployee}
         userReputation={userReputation}
         timestamp={timestamp}
@@ -119,16 +133,25 @@ const Comment = ({
       
       <CommentBody content={content} />
       
-      <CommentActions 
-        isEmployee={isEmployee}
-        bitcoinAddress={bitcoinAddress}
-        upvotes={localUpvotes}
-        downvotes={localDownvotes}
-        userVote={userVote}
-        onUpvote={handleUpvote}
-        onDownvote={handleDownvote}
-        onReply={() => setIsReplying(!isReplying)}
-      />
+      <div className="flex justify-between items-center">
+        <CommentActions 
+          isEmployee={isEmployee}
+          bitcoinAddress={bitcoinAddress}
+          upvotes={localUpvotes}
+          downvotes={localDownvotes}
+          userVote={userVote}
+          onUpvote={handleUpvote}
+          onDownvote={handleDownvote}
+          onReply={() => setIsReplying(!isReplying)}
+        />
+        
+        {isAdmin && (
+          <AdminCommentActions 
+            commentId={id}
+            onDeleted={handleCommentDeleted}
+          />
+        )}
+      </div>
       
       {isReplying && (
         <CommentReplyForm 
@@ -137,7 +160,10 @@ const Comment = ({
         />
       )}
       
-      <CommentReplies replies={localReplies} />
+      <CommentReplies 
+        replies={localReplies}
+        isAdmin={isAdmin}
+      />
     </motion.div>
   );
 };

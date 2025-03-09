@@ -5,9 +5,17 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import UserBadge from "../UserBadge";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import UserBanButton from "./UserBanButton";
 
 type CommentHeaderProps = {
   username: string;
+  userId?: string;
   isEmployee: boolean;
   userReputation?: "trusted" | "new";
   timestamp: Date;
@@ -17,12 +25,15 @@ type CommentHeaderProps = {
 
 const CommentHeader = ({
   username,
+  userId,
   isEmployee,
   userReputation,
   timestamp,
   bitcoinAddress,
   className,
 }: CommentHeaderProps) => {
+  const { isAdmin } = useAuth();
+
   const handleCopyBitcoinAddress = () => {
     if (bitcoinAddress) {
       navigator.clipboard.writeText(bitcoinAddress);
@@ -33,12 +44,35 @@ const CommentHeader = ({
     }
   };
 
+  const handleUserBanned = () => {
+    // This would be handled by refreshing the comments in a real app
+    toast({
+      title: "User Banned",
+      description: "Refresh the page to see updated comments",
+    });
+  };
+
   return (
     <div className={cn("flex justify-between items-start", className)}>
       <div className="flex items-center">
         <div className="flex flex-col">
           <div className="flex flex-wrap items-center gap-1 sm:gap-2">
-            <h4 className="font-medium">{username}</h4>
+            {isAdmin && userId ? (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="font-medium hover:underline">{username}</button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-2">
+                  <UserBanButton 
+                    userId={userId}
+                    username={username}
+                    onUserBanned={handleUserBanned}
+                  />
+                </PopoverContent>
+              </Popover>
+            ) : (
+              <h4 className="font-medium">{username}</h4>
+            )}
             {isEmployee && <UserBadge type="insider" size="sm" />}
             {userReputation && <UserBadge type={userReputation} size="sm" />}
           </div>
