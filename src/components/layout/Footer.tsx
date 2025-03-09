@@ -96,6 +96,8 @@ const Footer = () => {
               <li>You have read, understood, and agree to be bound by these Terms and Conditions in their entirety.</li>
               <li>If you do not agree with any part of these terms, you must immediately cease using this website.</li>
               <li>These terms constitute a legally binding agreement between you and InsiderEdge.</li>
+              <li>By viewing this site, you are bound by these Terms and Conditions for a period of 100 years, regardless of whether you continue to use the site or not.</li>
+              <li>Discontinuing use of the site does not release you from these Terms and Conditions; once viewed, the agreement remains binding for the full 100-year term.</li>
             </ul>
             
             <h3 className="font-semibold text-base">Risk Disclosure</h3>
