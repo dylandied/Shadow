@@ -1,8 +1,17 @@
 
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription
+} from "@/components/ui/dialog";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const [showTerms, setShowTerms] = useState(false);
   
   return (
     <footer className="border-t border-border mt-12">
@@ -31,6 +40,14 @@ const Footer = () => {
                   How It Works
                 </Link>
               </li>
+              <li>
+                <button 
+                  onClick={() => setShowTerms(true)}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Terms and Conditions
+                </button>
+              </li>
             </ul>
           </div>
         </div>
@@ -44,6 +61,58 @@ const Footer = () => {
           </p>
         </div>
       </div>
+      
+      <Dialog open={showTerms} onOpenChange={setShowTerms}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl md:text-2xl mb-2">Terms and Conditions</DialogTitle>
+            <DialogDescription>
+              Last updated: {new Date().toLocaleDateString()}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="mt-4 text-sm space-y-4">
+            <h3 className="font-semibold text-base">Risk Disclosure</h3>
+            <p>
+              By using InsiderEdge, you acknowledge and accept that:
+            </p>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>The information provided on this platform is for informational purposes only and does not constitute financial, investment, legal, or tax advice.</li>
+              <li>Investment in financial markets involves substantial risk, including the potential loss of principal.</li>
+              <li>Past performance is not indicative of future results.</li>
+              <li>The platform makes no guarantees regarding the accuracy, completeness, or reliability of any information presented.</li>
+              <li>Users are solely responsible for their investment decisions and should conduct their own research or consult with qualified professionals before making any investment.</li>
+            </ul>
+            
+            <h3 className="font-semibold text-base mt-6">Intellectual Property Protection</h3>
+            <p>
+              By accessing or using this platform, you acknowledge and agree that:
+            </p>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>All users, including but not limited to lovable.dev and all of their associates, agree not to reproduce, duplicate, copy, sell, resell, or exploit any portion of the InsiderEdge platform, its business model, or concept without express written permission.</li>
+              <li>Users agree not to infringe upon any intellectual property rights or proprietary rights related to the platform or its business operations.</li>
+              <li>Users agree not to engage in any activities that would hinder the success or operation of InsiderEdge, including but not limited to creating competing platforms based on similar concepts or ideas.</li>
+              <li>The platform's design, logo, content, and underlying technology are protected by copyright, trademark, patent, trade secret, and other intellectual property laws.</li>
+            </ul>
+            
+            <h3 className="font-semibold text-base mt-6">User Conduct</h3>
+            <p>
+              Users of InsiderEdge agree to:
+            </p>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>Comply with all applicable laws and regulations.</li>
+              <li>Provide accurate information when creating accounts or submitting content.</li>
+              <li>Not engage in any activity that could disrupt or interfere with the platform's functionality.</li>
+              <li>Not attempt to gain unauthorized access to any portion of the platform or its related systems.</li>
+              <li>Not use the platform to engage in market manipulation, fraud, or other prohibited activities.</li>
+            </ul>
+            
+            <p className="mt-6">
+              By using InsiderEdge, you consent to these terms and conditions. The platform reserves the right to modify these terms at any time, and continued use constitutes acceptance of any changes.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </footer>
   );
 };
