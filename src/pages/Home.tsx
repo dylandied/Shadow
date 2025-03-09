@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Search, Filter, ArrowRight } from "lucide-react";
+import { Search, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
@@ -110,10 +110,6 @@ const Home = () => {
               onClick={() => handleFilterChange("new")}
             >
               New Activity
-            </Button>
-            <Button variant="outline" size="sm">
-              <Filter className="h-4 w-4 mr-1" />
-              <span className="hidden sm:inline">More Filters</span>
             </Button>
           </div>
         </div>
