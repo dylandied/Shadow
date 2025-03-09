@@ -28,8 +28,8 @@ export function useCommentVote(commentId: string) {
           return;
         }
         
-        setUpvotes(comment.upvotes || 0);
-        setDownvotes(comment.downvotes || 0);
+        setUpvotes(comment?.upvotes || 0);
+        setDownvotes(comment?.downvotes || 0);
         
         // Get user's vote if authenticated
         if (user) {
@@ -53,15 +53,6 @@ export function useCommentVote(commentId: string) {
 
   // Handle upvote
   const handleUpvote = async () => {
-    if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to vote on comments",
-        variant: "destructive",
-      });
-      return;
-    }
-    
     setIsLoading(true);
     
     try {
@@ -69,7 +60,7 @@ export function useCommentVote(commentId: string) {
       if (currentVote === 'up') {
         await supabase.rpc('delete_comment_vote', {
           p_comment_id: commentId,
-          p_user_id: user.id
+          p_user_id: user?.id || 'anonymous'
         });
         
         setCurrentVote(null);
@@ -79,7 +70,7 @@ export function useCommentVote(commentId: string) {
       else if (currentVote === 'down') {
         await supabase.rpc('update_comment_vote', {
           p_comment_id: commentId,
-          p_user_id: user.id,
+          p_user_id: user?.id || 'anonymous',
           p_vote_type: 'up'
         });
         
@@ -91,7 +82,7 @@ export function useCommentVote(commentId: string) {
       else {
         await supabase.rpc('insert_comment_vote', {
           p_comment_id: commentId,
-          p_user_id: user.id,
+          p_user_id: user?.id || 'anonymous',
           p_vote_type: 'up'
         });
         
@@ -112,15 +103,6 @@ export function useCommentVote(commentId: string) {
 
   // Handle downvote
   const handleDownvote = async () => {
-    if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to vote on comments",
-        variant: "destructive",
-      });
-      return;
-    }
-    
     setIsLoading(true);
     
     try {
@@ -128,7 +110,7 @@ export function useCommentVote(commentId: string) {
       if (currentVote === 'down') {
         await supabase.rpc('delete_comment_vote', {
           p_comment_id: commentId,
-          p_user_id: user.id
+          p_user_id: user?.id || 'anonymous'
         });
         
         setCurrentVote(null);
@@ -138,7 +120,7 @@ export function useCommentVote(commentId: string) {
       else if (currentVote === 'up') {
         await supabase.rpc('update_comment_vote', {
           p_comment_id: commentId,
-          p_user_id: user.id,
+          p_user_id: user?.id || 'anonymous',
           p_vote_type: 'down'
         });
         
@@ -150,7 +132,7 @@ export function useCommentVote(commentId: string) {
       else {
         await supabase.rpc('insert_comment_vote', {
           p_comment_id: commentId,
-          p_user_id: user.id,
+          p_user_id: user?.id || 'anonymous',
           p_vote_type: 'down'
         });
         

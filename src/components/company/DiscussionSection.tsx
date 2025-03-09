@@ -1,7 +1,7 @@
 
 import CommentSorter from "@/components/company/CommentSorter";
 import CommentsList from "@/components/company/CommentsList";
-import { CommentForm } from "@/components/company/CommentForm";
+import CommentForm from "@/components/company/CommentForm";
 import { Comment, SortOption } from "@/types";
 
 export interface DiscussionSectionProps {
