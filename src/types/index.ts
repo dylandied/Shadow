@@ -42,3 +42,5 @@ export type Insight = {
   sourcesCount: number;
   lastUpdated: string;
 };
+
+export type SortOption = "newest" | "oldest" | "most_upvoted" | "most_discussed";
