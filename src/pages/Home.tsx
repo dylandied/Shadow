@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import SearchBar from "@/components/ui/SearchBar";
 import { mockCompanies } from "@/data/mockData";
+import { supabase } from "@/integrations/supabase/client";
 
 // Animation variants
 const containerVariants = {
@@ -43,6 +44,7 @@ const Home = () => {
   const [filter, setFilter] = useState("all");
   const [companies, setCompanies] = useState(mockCompanies);
   
+  // Apply filtering to companies
   const handleFilterChange = (newFilter: string) => {
     setFilter(newFilter);
     
@@ -54,6 +56,127 @@ const Home = () => {
       setCompanies([...mockCompanies].sort((a, b) => b.lastUpdate.getTime() - a.lastUpdate.getTime()));
     }
   };
+  
+  useEffect(() => {
+    // Subscribe to real-time updates for companies
+    const channel = supabase
+      .channel('companies-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'companies'
+        },
+        (payload) => {
+          // Update companies when changes occur
+          if (payload.new) {
+            setCompanies(prevCompanies => {
+              // Find if company already exists in our list
+              const existingIndex = prevCompanies.findIndex(c => c.id === payload.new.id);
+              
+              if (existingIndex >= 0) {
+                // Update existing company
+                const updatedCompanies = [...prevCompanies];
+                updatedCompanies[existingIndex] = {
+                  ...updatedCompanies[existingIndex],
+                  ...payload.new,
+                  lastUpdate: payload.new.last_update ? new Date(payload.new.last_update) : new Date(),
+                };
+                return updatedCompanies;
+              } else {
+                // Add new company (in real app, you would format the data properly)
+                return [...prevCompanies, {
+                  ...payload.new,
+                  id: payload.new.id,
+                  name: payload.new.name,
+                  ticker: payload.new.ticker,
+                  industry: payload.new.industry || "Unknown",
+                  logo: payload.new.logo_url,
+                  insidersCount: 0,
+                  postsCount: 0,
+                  lastUpdate: payload.new.last_update ? new Date(payload.new.last_update) : new Date(),
+                  isNew: true,
+                  isHot: false,
+                  activityLevel: 0
+                }];
+              }
+            });
+          }
+        }
+      )
+      .subscribe();
+      
+    // Subscribe to real-time updates for insiders count (comments)
+    const commentsChannel = supabase
+      .channel('comments-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'comments'
+        },
+        (payload) => {
+          if (payload.new && payload.new.company_id) {
+            // Update company data when a new comment is added
+            setCompanies(prevCompanies => {
+              return prevCompanies.map(company => {
+                if (company.id === payload.new.company_id) {
+                  return {
+                    ...company,
+                    insidersCount: company.insidersCount + 1,
+                    postsCount: company.postsCount + 1,
+                    activityLevel: company.activityLevel + 1,
+                    lastUpdate: new Date()
+                  };
+                }
+                return company;
+              });
+            });
+          }
+        }
+      )
+      .subscribe();
+      
+    // Subscribe to real-time updates for insiders count (votes)
+    const votesChannel = supabase
+      .channel('votes-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'insight_votes'
+        },
+        (payload) => {
+          if (payload.new && payload.new.company_id) {
+            // Update company data when a new vote is added
+            setCompanies(prevCompanies => {
+              return prevCompanies.map(company => {
+                if (company.id === payload.new.company_id) {
+                  return {
+                    ...company,
+                    insidersCount: company.insidersCount + 1,
+                    activityLevel: company.activityLevel + 1,
+                    lastUpdate: new Date()
+                  };
+                }
+                return company;
+              });
+            });
+          }
+        }
+      )
+      .subscribe();
+    
+    // Cleanup function
+    return () => {
+      supabase.removeChannel(channel);
+      supabase.removeChannel(commentsChannel);
+      supabase.removeChannel(votesChannel);
+    };
+  }, []);
   
   return (
     <div className="container mx-auto px-4 pt-24 pb-16">

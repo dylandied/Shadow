@@ -2,12 +2,94 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
 
 type CompanyHeaderProps = {
   company: any;
 };
 
-const CompanyHeader = ({ company }: CompanyHeaderProps) => {
+const CompanyHeader = ({ company: initialCompany }: CompanyHeaderProps) => {
+  const [company, setCompany] = useState(initialCompany);
+  
+  useEffect(() => {
+    // Update local state when the initial company prop changes
+    setCompany(initialCompany);
+  }, [initialCompany]);
+  
+  useEffect(() => {
+    // Subscribe to real-time updates for this company
+    const channel = supabase
+      .channel('company-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'companies',
+          filter: `id=eq.${company.id}`
+        },
+        (payload) => {
+          // Update company data when changes occur
+          if (payload.new) {
+            setCompany(prevCompany => ({
+              ...prevCompany,
+              ...payload.new,
+              // Preserve fields that might not be in the payload
+              lastUpdate: payload.new.last_update ? new Date(payload.new.last_update) : prevCompany.lastUpdate,
+            }));
+          }
+        }
+      )
+      .subscribe();
+      
+    // Subscribe to real-time updates for employee counts (comments and votes)
+    const insidersChannel = supabase
+      .channel('insiders-count')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'comments',
+          filter: `company_id=eq.${company.id}`
+        },
+        () => {
+          // Increment insiders count for new employee comments
+          setCompany(prevCompany => ({
+            ...prevCompany,
+            insidersCount: prevCompany.insidersCount + 1,
+            lastUpdate: new Date(),
+          }));
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'insight_votes',
+          filter: `company_id=eq.${company.id}`
+        },
+        () => {
+          // Increment insiders count for new employee votes
+          setCompany(prevCompany => ({
+            ...prevCompany,
+            insidersCount: prevCompany.insidersCount + 1,
+            lastUpdate: new Date(),
+          }));
+        }
+      )
+      .subscribe();
+      
+    // Cleanup subscriptions when component unmounts
+    return () => {
+      supabase.removeChannel(channel);
+      supabase.removeChannel(insidersChannel);
+    };
+  }, [company.id]);
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
