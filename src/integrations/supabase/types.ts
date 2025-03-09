@@ -125,7 +125,7 @@ export type Database = {
           created_at: string | null
           id: string
           is_employee: boolean | null
-          role: Database["public"]["Enums"]["user_role"]
+          role: string
           user_type: string | null
           username: string
         }
@@ -135,7 +135,7 @@ export type Database = {
           created_at?: string | null
           id: string
           is_employee?: boolean | null
-          role?: Database["public"]["Enums"]["user_role"]
+          role?: string
           user_type?: string | null
           username: string
         }
@@ -145,7 +145,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           is_employee?: boolean | null
-          role?: Database["public"]["Enums"]["user_role"]
+          role?: string
           user_type?: string | null
           username?: string
         }
