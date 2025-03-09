@@ -35,10 +35,12 @@ const CommentActions = ({
           size="sm"
           className={cn(
             "h-8 px-2 text-xs",
-            userVote === "up" ? "text-insight-positive" : "text-muted-foreground"
+            userVote === "up" ? "text-insight-positive" : "text-muted-foreground",
+            !isSignedIn && "cursor-not-allowed opacity-70"
           )}
           onClick={onUpvote}
-          title={!isSignedIn ? "Sign in to vote" : undefined}
+          title={!isSignedIn ? "Sign in to vote" : "Upvote"}
+          aria-label={!isSignedIn ? "Sign in to vote" : "Upvote"}
         >
           <ArrowUp className="h-3 w-3 mr-1" />
           <span>{upvotes}</span>
@@ -49,10 +51,12 @@ const CommentActions = ({
           size="sm"
           className={cn(
             "h-8 px-2 text-xs",
-            userVote === "down" ? "text-insight-negative" : "text-muted-foreground"
+            userVote === "down" ? "text-insight-negative" : "text-muted-foreground",
+            !isSignedIn && "cursor-not-allowed opacity-70"
           )}
           onClick={onDownvote}
-          title={!isSignedIn ? "Sign in to vote" : undefined}
+          title={!isSignedIn ? "Sign in to vote" : "Downvote"}
+          aria-label={!isSignedIn ? "Sign in to vote" : "Downvote"}
         >
           <ArrowDown className="h-3 w-3 mr-1" />
           <span>{downvotes}</span>
