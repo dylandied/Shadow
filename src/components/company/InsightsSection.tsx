@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,13 +5,23 @@ import InsightCard from "@/components/ui/InsightCard";
 import { containerVariants, itemVariants } from "@/utils/animationVariants";
 import { usePermissions } from "@/hooks/use-permissions";
 import { useAuth } from "@/context/AuthContext";
+import { Insight } from "@/types";
+import { useInsightVote } from "@/hooks/use-insight-vote";
 
 type InsightsSectionProps = {
-  companyId?: string;
+  insights?: Insight[];
+  companyId: string;
+  isLoading?: boolean;
+  isEmployee: boolean;
+  isSignedIn: boolean;
 };
 
 const InsightsSection = ({
+  insights = [],
   companyId,
+  isLoading = false,
+  isEmployee,
+  isSignedIn
 }: InsightsSectionProps) => {
   const { user } = useAuth();
   const { canVoteOnInsights } = usePermissions();

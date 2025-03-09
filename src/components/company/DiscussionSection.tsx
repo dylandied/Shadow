@@ -1,43 +1,41 @@
 
-import { useState } from "react";
-import { SortOption } from "@/types";
-import { Comment } from "@/types";
-import CommentForm from "./CommentForm";
-import CommentsList from "./CommentsList";
-import CommentSorter from "./CommentSorter";
-import { usePermissions } from "@/hooks/use-permissions";
+import { CommentSorter } from "@/components/company/CommentSorter";
+import { CommentsList } from "@/components/company/CommentsList";
+import { CommentForm } from "@/components/company/CommentForm";
+import { Comment, SortOption } from "@/types";
 
-export type DiscussionSectionProps = {
+export interface DiscussionSectionProps {
   comments: Comment[];
   sortBy: SortOption;
   onSortChange: (option: string) => void;
   onSubmitComment: (content: string) => void;
-};
+  isEmployee: boolean;
+  isSignedIn: boolean;
+}
 
-const DiscussionSection = ({
+export function DiscussionSection({
   comments,
   sortBy,
   onSortChange,
-  onSubmitComment
-}: DiscussionSectionProps) => {
-  const { canComment } = usePermissions();
-
+  onSubmitComment,
+  isEmployee,
+  isSignedIn,
+}: DiscussionSectionProps) {
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h2 className="text-2xl font-semibold tracking-tight">Discussion</h2>
-        <CommentSorter value={sortBy} onChange={onSortChange} />
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Discussion</h2>
+        <CommentSorter 
+          onChange={onSortChange} 
+          value={sortBy} 
+        />
       </div>
-      
-      {canComment && (
+
+      {isSignedIn && isEmployee && (
         <CommentForm onSubmit={onSubmitComment} />
       )}
-      
-      <CommentsList 
-        comments={comments} 
-      />
+
+      <CommentsList comments={comments} />
     </div>
   );
-};
-
-export default DiscussionSection;
+}
