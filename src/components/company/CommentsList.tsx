@@ -1,13 +1,15 @@
 
 import Comment from "@/components/ui/Comment";
 import { Comment as CommentType } from "@/types";
+import { useAuth } from "@/context/AuthContext";
 
 type CommentsListProps = {
   comments: CommentType[];
-  isSignedIn?: boolean;
 };
 
-const CommentsList = ({ comments, isSignedIn = false }: CommentsListProps) => {
+const CommentsList = ({ comments }: CommentsListProps) => {
+  const { user } = useAuth();
+  
   if (comments.length === 0) {
     return (
       <div className="text-center py-6 sm:py-8">
@@ -32,7 +34,6 @@ const CommentsList = ({ comments, isSignedIn = false }: CommentsListProps) => {
           downvotes={comment.downvotes}
           timestamp={comment.timestamp}
           userReputation={comment.userReputation}
-          isSignedIn={isSignedIn}
         />
       ))}
     </div>
