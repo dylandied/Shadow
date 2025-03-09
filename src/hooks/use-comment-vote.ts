@@ -1,172 +1,184 @@
-
-import { useState, useEffect } from "react";
-import { toast } from "@/hooks/use-toast";
-import { VoteType } from "@/types";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
+import { useToast } from "./use-toast";
 
-interface UseCommentVoteProps {
-  initialUpvotes: number;
-  initialDownvotes: number;
-  initialUserVote?: VoteType;
-  isSignedIn: boolean;
-  commentId: string;
-}
+export type VoteType = "up" | "down" | null;
 
-export function useCommentVote({
-  initialUpvotes,
-  initialDownvotes,
-  initialUserVote = null,
-  isSignedIn,
-  commentId
-}: UseCommentVoteProps) {
-  const [userVote, setUserVote] = useState<VoteType>(initialUserVote);
-  const [upvotes, setUpvotes] = useState(initialUpvotes);
-  const [downvotes, setDownvotes] = useState(initialDownvotes);
+export function useCommentVote(commentId: string) {
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Fetch user's vote when signed in
-  useEffect(() => {
-    if (isSignedIn && commentId) {
-      fetchUserVote();
-    }
-  }, [isSignedIn, commentId]);
-  
-  const fetchUserVote = async () => {
+  const [currentVote, setCurrentVote] = useState<VoteType>(null);
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  // Load initial vote status
+  const fetchInitialVote = async () => {
+    if (!user) return;
+
+    setIsLoading(true);
     try {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session?.session?.user) return;
-      
-      // Using raw SQL query as a workaround since comment_votes table isn't in the TypeScript types
       const { data, error } = await supabase
-        .from('comment_votes')
-        .select('vote_type')
-        .eq('comment_id', commentId)
-        .eq('user_id', session.session.user.id)
-        .maybeSingle();
-      
+        .rpc('get_comment_vote', {
+          p_comment_id: commentId,
+          p_user_id: user.id
+        });
+
       if (error) {
-        console.error('Error fetching vote:', error);
+        console.error("Error fetching vote:", error);
         return;
       }
-      
+
       if (data) {
-        setUserVote(data.vote_type as VoteType);
+        setCurrentVote(data as VoteType);
       }
     } catch (error) {
-      console.error('Error fetching user vote:', error);
-    }
-  };
-
-  const showSignInToast = () => {
-    toast({
-      title: "Sign in required",
-      description: "You need to sign in to vote on comments.",
-      variant: "destructive",
-    });
-  };
-
-  const handleVote = async (voteType: VoteType) => {
-    if (!isSignedIn) {
-      showSignInToast();
-      return;
-    }
-    
-    try {
-      setIsLoading(true);
-      
-      const { data: session } = await supabase.auth.getSession();
-      if (!session?.session?.user) {
-        return;
-      }
-      
-      // If user clicks on the same vote type they already selected, remove their vote
-      if (userVote === voteType) {
-        // Using raw SQL query as workaround
-        const { error } = await supabase
-          .rpc('delete_comment_vote', {
-            p_comment_id: commentId,
-            p_user_id: session.session.user.id
-          });
-          
-        if (error) {
-          throw error;
-        }
-          
-        // Update local state
-        if (voteType === 'up') {
-          setUpvotes(prev => prev - 1);
-        } else {
-          setDownvotes(prev => prev - 1);
-        }
-        setUserVote(null);
-      } 
-      // If user is changing their vote from one type to another
-      else if (userVote !== null) {
-        // Using raw SQL query as workaround
-        const { error } = await supabase
-          .rpc('update_comment_vote', { 
-            p_comment_id: commentId,
-            p_user_id: session.session.user.id,
-            p_vote_type: voteType
-          });
-        
-        if (error) {
-          throw error;
-        }
-        
-        // Update local state
-        if (voteType === 'up') {
-          setUpvotes(prev => prev + 1);
-          setDownvotes(prev => prev - 1);
-        } else {
-          setUpvotes(prev => prev - 1);
-          setDownvotes(prev => prev + 1);
-        }
-        setUserVote(voteType);
-      } 
-      // If user is voting for the first time
-      else {
-        // Using raw SQL query as workaround
-        const { error } = await supabase
-          .rpc('insert_comment_vote', {
-            p_comment_id: commentId,
-            p_user_id: session.session.user.id,
-            p_vote_type: voteType
-          });
-        
-        if (error) {
-          throw error;
-        }
-        
-        // Update local state
-        if (voteType === 'up') {
-          setUpvotes(prev => prev + 1);
-        } else {
-          setDownvotes(prev => prev + 1);
-        }
-        setUserVote(voteType);
-      }
-    } catch (error) {
-      console.error('Error handling vote:', error);
-      toast({
-        title: "Error",
-        description: "Failed to record your vote. Please try again.",
-        variant: "destructive",
-      });
+      console.error("Error fetching vote:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleUpvote = () => handleVote('up');
-  const handleDownvote = () => handleVote('down');
+  // Delete an existing vote
+  const deleteVote = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to vote on comments",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .rpc('delete_comment_vote', {
+          p_comment_id: commentId,
+          p_user_id: user.id
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      setCurrentVote(null);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to remove vote. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Error removing vote:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Update an existing vote
+  const updateVote = async (voteType: VoteType) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to vote on comments",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .rpc('update_comment_vote', {
+          p_comment_id: commentId,
+          p_user_id: user.id,
+          p_vote_type: voteType
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      setCurrentVote(voteType);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update vote. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Error updating vote:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Insert a new vote
+  const insertVote = async (voteType: VoteType) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to vote on comments",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .rpc('insert_comment_vote', {
+          p_comment_id: commentId,
+          p_user_id: user.id,
+          p_vote_type: voteType
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      setCurrentVote(voteType);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to submit vote. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Error submitting vote:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle voting
+  const vote = async (voteType: VoteType) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to vote on comments",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // If clicking the same vote type again, remove the vote
+    if (voteType === currentVote) {
+      await deleteVote();
+      return;
+    }
+
+    // If there's an existing vote but of a different type, update it
+    if (currentVote !== null) {
+      await updateVote(voteType);
+      return;
+    }
+
+    // Otherwise, insert a new vote
+    await insertVote(voteType);
+  };
 
   return {
-    userVote,
-    upvotes,
-    downvotes,
+    vote,
+    currentVote,
     isLoading,
-    handleUpvote,
-    handleDownvote
+    fetchInitialVote,
   };
 }
