@@ -1,12 +1,11 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, UserPlus, Bitcoin } from "lucide-react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 import {
   Dialog,
@@ -42,7 +41,6 @@ const userBaseSchema = z.object({
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
     .regex(/[0-9]/, "Password must contain at least one number")
     .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
-  email: z.string().email("Invalid email address"),
 });
 
 const traderSchema = userBaseSchema;
@@ -51,9 +49,8 @@ const employeeSchema = userBaseSchema.extend({
   bitcoinAddress: z
     .string()
     .min(26, "Bitcoin address must be at least 26 characters")
-    .max(65, "Bitcoin address must be at most 65 characters")
-    // Loosened bitcoin address regex to accept more address formats
-    .regex(/^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$|^bc1[a-z0-9]{8,87}$|^[a-zA-Z0-9]{26,65}$/, "Invalid Bitcoin address format"),
+    .max(35, "Bitcoin address must be at most 35 characters")
+    .regex(/^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$|^bc1[a-z0-9]{39,59}$/, "Invalid Bitcoin address format"),
 });
 
 type AuthDialogProps = {
@@ -65,7 +62,6 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   const navigate = useNavigate();
   const [userType, setUserType] = useState<"trader" | "employee">("trader");
   const [isLogin, setIsLogin] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
   
   // Initialize forms for both user types
   const traderForm = useForm<z.infer<typeof traderSchema>>({
@@ -73,7 +69,6 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
     defaultValues: {
       username: "",
       password: "",
-      email: "",
     },
   });
   
@@ -82,109 +77,57 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
     defaultValues: {
       username: "",
       password: "",
-      email: "",
       bitcoinAddress: "",
     },
   });
-
-  const handleSignUp = async (
-    email: string, 
-    password: string, 
-    username: string, 
-    bitcoinAddress?: string
-  ) => {
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            username,
-            user_type: userType,
-            bitcoin_address: bitcoinAddress || null,
-            is_employee: userType === "employee"
-          }
-        }
-      });
-
-      if (error) {
-        console.error("Signup error:", error);
-        throw error;
-      }
-
-      // Handle success
-      toast({
-        title: "Account created",
-        description: "Welcome to Insider Edge!",
-      });
-      
-      onOpenChange(false);
-    } catch (error: any) {
-      console.error("Error during signup:", error);
-      toast({
-        title: "Signup failed",
-        description: error?.message || "Please try again later",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSignIn = async (email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) {
-        console.error("Login error:", error);
-        throw error;
-      }
-
-      // Handle success
-      toast({
-        title: "Signed in",
-        description: "Welcome back!",
-      });
-      
-      onOpenChange(false);
-    } catch (error: any) {
-      console.error("Error during login:", error);
-      toast({
-        title: "Login failed",
-        description: error?.message || "Invalid credentials",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
   
   const onSubmit = async (data: any) => {
-    if (isLogin) {
-      await handleSignIn(data.email, data.password);
-    } else {
-      if (userType === "trader") {
-        await handleSignUp(data.email, data.password, data.username);
+    try {
+      // Simulate checking if username exists
+      const usernameExists = Math.random() > 0.8; // 20% chance username exists (for demo)
+      
+      if (isLogin) {
+        // Login logic would go here
+        console.log("Logging in:", data);
+        toast({
+          title: "Successfully logged in",
+          description: `Welcome back, ${data.username}!`,
+        });
+        onOpenChange(false);
       } else {
-        await handleSignUp(data.email, data.password, data.username, data.bitcoinAddress);
+        // Signup logic
+        if (usernameExists) {
+          if (userType === "trader") {
+            traderForm.setError("username", { 
+              message: "Username already taken" 
+            });
+          } else {
+            employeeForm.setError("username", { 
+              message: "Username already taken" 
+            });
+          }
+          return;
+        }
+        
+        console.log("Signing up:", data);
+        toast({
+          title: "Account created",
+          description: `Welcome to Insider Edge, ${data.username}!`,
+        });
+        onOpenChange(false);
       }
+    } catch (error) {
+      console.error("Auth error:", error);
+      toast({
+        title: "Authentication failed",
+        description: "Please try again later",
+        variant: "destructive",
+      });
     }
   };
   
   return (
-    <Dialog open={open} onOpenChange={(newOpen) => {
-      // Reset forms when dialog closes
-      if (!newOpen) {
-        traderForm.reset();
-        employeeForm.reset();
-      }
-      onOpenChange(newOpen);
-    }}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
@@ -217,33 +160,17 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
           </Tabs>
         )}
         
-        {userType === "trader" || isLogin ? (
+        {userType === "trader" ? (
           <Form {...traderForm}>
             <form onSubmit={traderForm.handleSubmit(onSubmit)} className="space-y-4">
-              {!isLogin && (
-                <FormField
-                  control={traderForm.control}
-                  name="username"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Username</FormLabel>
-                      <FormControl>
-                        <Input placeholder="username" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-              
               <FormField
                 control={traderForm.control}
-                name="email"
+                name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="your@email.com" {...field} />
+                      <Input placeholder="username" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -270,16 +197,11 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                   variant="outline" 
                   onClick={() => setIsLogin(!isLogin)}
                   className="w-full sm:w-auto order-2 sm:order-1"
-                  disabled={isLoading}
                 >
                   {isLogin ? "Create an account" : "Login instead"}
                 </Button>
-                <Button 
-                  type="submit" 
-                  className="w-full sm:w-auto order-1 sm:order-2"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Processing..." : isLogin ? "Sign in" : "Create account"}
+                <Button type="submit" className="w-full sm:w-auto order-1 sm:order-2">
+                  {isLogin ? "Sign in" : "Create account"}
                 </Button>
               </DialogFooter>
             </form>
@@ -295,20 +217,6 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                     <FormLabel>Username</FormLabel>
                     <FormControl>
                       <Input placeholder="username" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={employeeForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="your@email.com" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -354,16 +262,11 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                   variant="outline" 
                   onClick={() => setIsLogin(!isLogin)}
                   className="w-full sm:w-auto order-2 sm:order-1"
-                  disabled={isLoading}
                 >
                   {isLogin ? "Create an account" : "Login instead"}
                 </Button>
-                <Button 
-                  type="submit" 
-                  className="w-full sm:w-auto order-1 sm:order-2"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Processing..." : isLogin ? "Sign in" : "Create account"}
+                <Button type="submit" className="w-full sm:w-auto order-1 sm:order-2">
+                  {isLogin ? "Sign in" : "Create account"}
                 </Button>
               </DialogFooter>
             </form>

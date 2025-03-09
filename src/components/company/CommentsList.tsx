@@ -1,5 +1,4 @@
 
-import { useAuth } from "@/hooks/use-auth";
 import Comment from "@/components/ui/Comment";
 import { Comment as CommentType } from "@/types";
 
@@ -9,8 +8,6 @@ type CommentsListProps = {
 };
 
 const CommentsList = ({ comments, isSignedIn = false }: CommentsListProps) => {
-  const { user } = useAuth();
-  
   if (comments.length === 0) {
     return (
       <div className="text-center py-6 sm:py-8">
@@ -36,7 +33,6 @@ const CommentsList = ({ comments, isSignedIn = false }: CommentsListProps) => {
           timestamp={comment.timestamp}
           userReputation={comment.userReputation}
           isSignedIn={isSignedIn}
-          userType={user?.isEmployee ? "employee" : "trader"}
         />
       ))}
     </div>

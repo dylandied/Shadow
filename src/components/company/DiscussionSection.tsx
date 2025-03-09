@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/use-auth";
 import CommentSorter from "./CommentSorter";
 import CommentForm from "./CommentForm";
 import CommentsList from "./CommentsList";
@@ -11,6 +10,8 @@ type DiscussionSectionProps = {
   sortBy: string;
   onSortChange: (option: string) => void;
   onSubmitComment: (content: string) => void;
+  isEmployee?: boolean;
+  isSignedIn?: boolean;
 };
 
 const DiscussionSection = ({ 
@@ -18,10 +19,9 @@ const DiscussionSection = ({
   sortBy, 
   onSortChange, 
   onSubmitComment,
+  isEmployee = false,
+  isSignedIn = false
 }: DiscussionSectionProps) => {
-  const { isSignedIn, user } = useAuth();
-  const isEmployee = user?.isEmployee || false;
-  
   // Track daily comment count and remaining comments
   const [commentsRemaining, setCommentsRemaining] = useState<number>(3);
 
@@ -35,12 +35,12 @@ const DiscussionSection = ({
       // Filter comments by the current user in the last 24 hours
       // This is a simplified mock implementation
       const recentCommentCount = comments.filter(comment => {
-        return comment.isEmployee && comment.username === user?.username && new Date(comment.timestamp) > last24Hours;
+        return comment.isEmployee && new Date(comment.timestamp) > last24Hours;
       }).length;
       
       setCommentsRemaining(Math.max(0, 3 - recentCommentCount));
     }
-  }, [comments, isEmployee, isSignedIn, user]);
+  }, [comments, isEmployee, isSignedIn]);
 
   // Render the appropriate comment form or message based on user state
   const renderCommentInput = () => {
