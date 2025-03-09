@@ -4,14 +4,13 @@ import CommentSorter from "./CommentSorter";
 import CommentForm from "./CommentForm";
 import CommentsList from "./CommentsList";
 import { Comment } from "@/types";
+import { useAuth } from "@/context/AuthContext";
 
 type DiscussionSectionProps = {
   comments: Comment[];
   sortBy: string;
   onSortChange: (option: string) => void;
   onSubmitComment: (content: string) => void;
-  isEmployee?: boolean;
-  isSignedIn?: boolean;
 };
 
 const DiscussionSection = ({ 
@@ -19,11 +18,11 @@ const DiscussionSection = ({
   sortBy, 
   onSortChange, 
   onSubmitComment,
-  isEmployee = false,
-  isSignedIn = false
 }: DiscussionSectionProps) => {
   // Track daily comment count and remaining comments
   const [commentsRemaining, setCommentsRemaining] = useState<number>(3);
+  const { user, isEmployee } = useAuth();
+  const isSignedIn = !!user;
 
   // Calculate how many comments are left for the current employee
   useEffect(() => {
@@ -84,7 +83,7 @@ const DiscussionSection = ({
       
       {renderCommentInput()}
       
-      <CommentsList comments={comments} isSignedIn={isSignedIn} />
+      <CommentsList comments={comments} />
     </div>
   );
 };

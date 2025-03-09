@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import TipButton from "../TipButton";
 import { cn } from "@/lib/utils";
 import { VoteType } from "@/types";
+import { useAuth } from "@/context/AuthContext";
 
 type CommentActionsProps = {
   isEmployee: boolean;
@@ -14,7 +15,6 @@ type CommentActionsProps = {
   onUpvote: () => void;
   onDownvote: () => void;
   className?: string;
-  isSignedIn?: boolean;
 };
 
 const CommentActions = ({
@@ -26,8 +26,10 @@ const CommentActions = ({
   onUpvote,
   onDownvote,
   className,
-  isSignedIn = false,
 }: CommentActionsProps) => {
+  const { user } = useAuth();
+  const isSignedIn = !!user;
+  
   // Render vote button with appropriate styles based on state
   const renderVoteButton = (
     type: "up" | "down", 
@@ -48,7 +50,7 @@ const CommentActions = ({
           isActive ? activeClass : "text-muted-foreground",
           !isSignedIn && "cursor-not-allowed opacity-70"
         )}
-        onClick={handler}
+        onClick={isSignedIn ? handler : undefined}
         title={!isSignedIn ? "Sign in to vote" : label}
         aria-label={!isSignedIn ? "Sign in to vote" : label}
       >

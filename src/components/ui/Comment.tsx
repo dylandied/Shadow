@@ -5,6 +5,7 @@ import CommentHeader from "./comment/CommentHeader";
 import CommentBody from "./comment/CommentBody";
 import CommentActions from "./comment/CommentActions";
 import { useCommentVote } from "@/hooks/use-comment-vote";
+import { useAuth } from "@/context/AuthContext";
 
 type CommentProps = {
   id: string;
@@ -19,7 +20,6 @@ type CommentProps = {
   replies?: string[];
   userReputation?: "trusted" | "new";
   className?: string;
-  isSignedIn?: boolean;
 };
 
 const Comment = ({
@@ -34,8 +34,10 @@ const Comment = ({
   replyTo,
   userReputation,
   className,
-  isSignedIn = false,
 }: CommentProps) => {
+  const { user } = useAuth();
+  const isSignedIn = !!user;
+  
   const { 
     userVote, 
     upvotes: localUpvotes, 
@@ -77,7 +79,6 @@ const Comment = ({
         userVote={userVote}
         onUpvote={handleUpvote}
         onDownvote={handleDownvote}
-        isSignedIn={isSignedIn}
       />
     </motion.div>
   );

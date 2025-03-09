@@ -1,18 +1,29 @@
 
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Building, Plus, UserCircle } from "lucide-react";
+import { Menu, X, Building, Plus, UserCircle, LogOut, Bitcoin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AddCompanyDialog } from "@/components/ui/AddCompanyDialog";
 import { AuthDialog } from "@/components/ui/AuthDialog";
+import { BitcoinAddressDialog } from "@/components/ui/BitcoinAddressDialog";
+import { useAuth } from "@/context/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isBitcoinAddressOpen, setIsBitcoinAddressOpen] = useState(false);
   const location = useLocation();
+  const { user, profile, isEmployee, signOut } = useAuth();
   
   // Handle scroll effect
   useEffect(() => {
@@ -28,6 +39,10 @@ const Navbar = () => {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location]);
+  
+  const handleSignOut = async () => {
+    await signOut();
+  };
   
   return (
     <header 
@@ -74,10 +89,36 @@ const Navbar = () => {
               <span>Add Company</span>
             </Button>
             
-            <Button variant="default" size="sm" onClick={() => setIsAuthOpen(true)}>
-              <UserCircle className="h-4 w-4 mr-1" />
-              <span>Sign In</span>
-            </Button>
+            {user && profile ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <UserCircle className="h-4 w-4" />
+                    <span>{profile.username}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {isEmployee && (
+                    <>
+                      <DropdownMenuItem onClick={() => setIsBitcoinAddressOpen(true)}>
+                        <Bitcoin className="h-4 w-4 mr-2" />
+                        <span>Change BTC Address</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    <span>Sign Out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button variant="default" size="sm" onClick={() => setIsAuthOpen(true)}>
+                <UserCircle className="h-4 w-4 mr-1" />
+                <span>Sign In</span>
+              </Button>
+            )}
           </nav>
           
           {/* Mobile Menu Button */}
@@ -134,18 +175,49 @@ const Navbar = () => {
               <span>Add Company</span>
             </Button>
             
-            <Button
-              variant="default"
-              size="sm"
-              className="w-full flex items-center justify-center"
-              onClick={() => {
-                setIsAuthOpen(true);
-                setIsMobileMenuOpen(false);
-              }}
-            >
-              <UserCircle className="h-4 w-4 mr-1" />
-              <span>Sign In</span>
-            </Button>
+            {user && profile ? (
+              <>
+                {isEmployee && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full flex items-center justify-center"
+                    onClick={() => {
+                      setIsBitcoinAddressOpen(true);
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    <Bitcoin className="h-4 w-4 mr-1" />
+                    <span>Change BTC Address</span>
+                  </Button>
+                )}
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="w-full flex items-center justify-center"
+                  onClick={() => {
+                    handleSignOut();
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  <LogOut className="h-4 w-4 mr-1" />
+                  <span>Sign Out</span>
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="default"
+                size="sm"
+                className="w-full flex items-center justify-center"
+                onClick={() => {
+                  setIsAuthOpen(true);
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                <UserCircle className="h-4 w-4 mr-1" />
+                <span>Sign In</span>
+              </Button>
+            )}
           </div>
         </div>
       )}
@@ -155,6 +227,9 @@ const Navbar = () => {
       
       {/* Auth Dialog */}
       <AuthDialog open={isAuthOpen} onOpenChange={setIsAuthOpen} />
+      
+      {/* Bitcoin Address Dialog */}
+      <BitcoinAddressDialog open={isBitcoinAddressOpen} onOpenChange={setIsBitcoinAddressOpen} />
     </header>
   );
 };
