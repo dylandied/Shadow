@@ -23,10 +23,6 @@ const Company = () => {
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<SortOption>("recent");
   
-  // For demo purposes, simulate whether user is an employee
-  const [isEmployee, setIsEmployee] = useState(false);
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  
   useEffect(() => {
     // Simulate data fetching
     const fetchData = async () => {
@@ -49,7 +45,7 @@ const Company = () => {
         .filter(c => c.companyId === id && c.isEmployee === true) // Only show employee comments
         .map(comment => {
           // Add trusted badge for comments with 20+ upvotes
-          const userReputation = comment.upvotes >= 20 ? "trusted" : comment.userReputation;
+          const userReputation = comment.upvotes >= 20 ? "trusted" : undefined;
           
           return {
             ...comment,
@@ -61,10 +57,6 @@ const Company = () => {
       // Sort comments based on selected option
       const sortedComments = sortCommentArray(companyComments, sortBy);
       setComments(sortedComments);
-      
-      // For demo, randomly decide if the user is signed in and an employee
-      setIsSignedIn(Math.random() > 0.5);
-      setIsEmployee(Math.random() > 0.7);
       
       setLoading(false);
     };
@@ -82,7 +74,7 @@ const Company = () => {
             const newComment = payload.new as Comment;
             if (newComment && newComment.isEmployee) {
               // Add trusted badge if upvotes >= 20
-              const userRep = newComment.upvotes >= 20 ? "trusted" : newComment.userReputation;
+              const userRep = newComment.upvotes >= 20 ? "trusted" : undefined;
               
               setComments(prevComments => {
                 const updatedComments = [...prevComments, {
@@ -138,7 +130,7 @@ const Company = () => {
       upvotes: 0,
       downvotes: 0,
       timestamp: new Date(),
-      userReputation: "new", // New comments start as "new"
+      userReputation: undefined, // New comments start without trusted badge
       replies: [],
       tipAmount: 0
     };
