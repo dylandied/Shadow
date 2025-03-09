@@ -55,10 +55,10 @@ const InsightFooter = ({
   
   return (
     <div className="flex justify-between items-center text-xs text-muted-foreground">
-      <span>
-        Based on {displayCount} {displayCount === 1 ? "vote" : "votes"}
+      <span className="truncate mr-2">
+        {displayCount} {displayCount === 1 ? "vote" : "votes"}
       </span>
-      <span>
+      <span className="whitespace-nowrap">
         Updated {lastUpdated}
       </span>
     </div>
