@@ -44,6 +44,7 @@ const DiscussionSection = ({
 
   // Render the appropriate comment form or message based on user state
   const renderCommentInput = () => {
+    // First check if user is signed in - this should always be the first condition
     if (!isSignedIn) {
       return (
         <div className="mb-6 sm:mb-8 p-3 bg-muted/50 rounded-lg text-center">
@@ -52,6 +53,7 @@ const DiscussionSection = ({
       );
     }
     
+    // If user is signed in but not an employee
     if (!isEmployee) {
       return (
         <div className="mb-6 sm:mb-8 p-3 bg-muted/50 rounded-lg text-center">
@@ -60,6 +62,7 @@ const DiscussionSection = ({
       );
     }
     
+    // If user is signed in and is an employee but has reached comment limit
     if (commentsRemaining <= 0) {
       return (
         <div className="mb-6 sm:mb-8 p-3 bg-muted/50 rounded-lg text-center">
@@ -68,6 +71,7 @@ const DiscussionSection = ({
       );
     }
     
+    // If user is signed in, is an employee, and has comments remaining
     return <CommentForm onSubmit={onSubmitComment} commentsRemaining={commentsRemaining} />;
   };
 
