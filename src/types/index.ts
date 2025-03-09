@@ -33,6 +33,7 @@ export type Comment = {
 export type InsightType = "sales" | "traffic" | "satisfaction" | "news";
 export type ChangeDirection = "up" | "down" | "neutral";
 export type VoteType = "up" | "down" | null;
+export type UserType = "trader" | "employee" | "admin";
 
 export type Insight = {
   type: InsightType;

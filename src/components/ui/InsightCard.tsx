@@ -16,7 +16,7 @@ type InsightCardProps = {
   sourcesCount: number;
   lastUpdated: string;
   companyId?: string;
-  isEmployee?: boolean;
+  canVote?: boolean;
   isSignedIn?: boolean;
 };
 
@@ -28,7 +28,7 @@ const InsightCard = ({
   sourcesCount,
   lastUpdated,
   companyId,
-  isEmployee = false,
+  canVote = false,
   isSignedIn = false,
 }: InsightCardProps) => {
   const {
@@ -37,7 +37,7 @@ const InsightCard = ({
     votesLoading,
     handleVote,
     getTimeUntilNextVote
-  } = useInsightVote(companyId, type, isSignedIn, isEmployee);
+  } = useInsightVote(companyId, type, isSignedIn);
 
   return (
     <motion.div
@@ -53,7 +53,7 @@ const InsightCard = ({
         {companyId && (
           <InsightVoteButtons
             isSignedIn={isSignedIn}
-            isEmployee={isEmployee}
+            canVote={canVote}
             userVote={userVote}
             onVote={handleVote}
             isLoading={votesLoading}

@@ -5,24 +5,23 @@ import { Comment } from "@/types";
 import CommentForm from "./CommentForm";
 import CommentsList from "./CommentsList";
 import CommentSorter from "./CommentSorter";
+import { usePermissions } from "@/hooks/use-permissions";
 
 export type DiscussionSectionProps = {
   comments: Comment[];
   sortBy: SortOption;
   onSortChange: (option: string) => void;
   onSubmitComment: (content: string) => void;
-  isEmployee: boolean;
-  isSignedIn: boolean;
 };
 
 const DiscussionSection = ({
   comments,
   sortBy,
   onSortChange,
-  onSubmitComment,
-  isEmployee,
-  isSignedIn
+  onSubmitComment
 }: DiscussionSectionProps) => {
+  const { canComment } = usePermissions();
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -30,13 +29,12 @@ const DiscussionSection = ({
         <CommentSorter value={sortBy} onChange={onSortChange} />
       </div>
       
-      {isEmployee && (
+      {canComment && (
         <CommentForm onSubmit={onSubmitComment} />
       )}
       
       <CommentsList 
         comments={comments} 
-        isSignedIn={isSignedIn}
       />
     </div>
   );

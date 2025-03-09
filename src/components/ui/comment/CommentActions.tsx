@@ -14,6 +14,8 @@ type CommentActionsProps = {
   userVote: VoteType;
   onUpvote: () => void;
   onDownvote: () => void;
+  canVote: boolean;
+  isLoading: boolean;
   className?: string;
 };
 
@@ -25,10 +27,10 @@ const CommentActions = ({
   userVote,
   onUpvote,
   onDownvote,
+  canVote,
+  isLoading,
   className,
 }: CommentActionsProps) => {
-  const { user } = useAuth();
-  const isSignedIn = !!user;
   
   // Render vote button with appropriate styles based on state
   const renderVoteButton = (
@@ -48,11 +50,12 @@ const CommentActions = ({
         className={cn(
           "h-8 px-2 text-xs",
           isActive ? activeClass : "text-muted-foreground",
-          !isSignedIn && "cursor-not-allowed opacity-70"
+          !canVote && "cursor-not-allowed opacity-70"
         )}
-        onClick={isSignedIn ? handler : undefined}
-        title={!isSignedIn ? "Sign in to vote" : label}
-        aria-label={!isSignedIn ? "Sign in to vote" : label}
+        onClick={canVote ? handler : undefined}
+        title={!canVote ? "Sign in to vote" : label}
+        aria-label={!canVote ? "Sign in to vote" : label}
+        disabled={isLoading}
       >
         {icon}
         <span>{count}</span>

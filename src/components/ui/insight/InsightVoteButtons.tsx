@@ -12,7 +12,7 @@ import {
 
 type InsightVoteButtonsProps = {
   isSignedIn: boolean;
-  isEmployee: boolean;
+  canVote: boolean;
   userVote: "up" | "down" | null;
   onVote: (vote: "up" | "down") => void;
   isLoading: boolean;
@@ -22,7 +22,7 @@ type InsightVoteButtonsProps = {
 
 const InsightVoteButtons = ({
   isSignedIn,
-  isEmployee,
+  canVote,
   userVote,
   onVote,
   isLoading,
@@ -32,7 +32,7 @@ const InsightVoteButtons = ({
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
   const handleVoteClick = (vote: "up" | "down") => {
-    if (!isSignedIn || !isEmployee || (userVote === vote && !canVoteAgain)) {
+    if (!isSignedIn || !canVote || (userVote === vote && !canVoteAgain)) {
       setIsTooltipOpen(true);
       setTimeout(() => setIsTooltipOpen(false), 2000);
       return;
@@ -49,7 +49,7 @@ const InsightVoteButtons = ({
     );
   }
 
-  if (!isEmployee) {
+  if (!canVote) {
     return (
       <div className="flex justify-between items-center py-3 mb-2 text-xs text-muted-foreground">
         <span>Only employees can vote on insights</span>

@@ -9,6 +9,41 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      comment_votes: {
+        Row: {
+          comment_id: string
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          user_id: string
+          vote_type: string
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id: string
+          vote_type: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+          vote_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_votes_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comments: {
         Row: {
           company_id: string | null
@@ -191,6 +226,36 @@ export type Database = {
       ban_user: {
         Args: {
           user_id_to_ban: string
+        }
+        Returns: undefined
+      }
+      delete_comment_vote: {
+        Args: {
+          p_comment_id: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
+      get_comment_vote: {
+        Args: {
+          p_comment_id: string
+          p_user_id: string
+        }
+        Returns: string
+      }
+      insert_comment_vote: {
+        Args: {
+          p_comment_id: string
+          p_user_id: string
+          p_vote_type: string
+        }
+        Returns: undefined
+      }
+      update_comment_vote: {
+        Args: {
+          p_comment_id: string
+          p_user_id: string
+          p_vote_type: string
         }
         Returns: undefined
       }

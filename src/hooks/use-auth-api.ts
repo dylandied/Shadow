@@ -2,11 +2,12 @@
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { UserType } from '@/types';
 
 export interface UserProfile {
   id: string;
   username: string;
-  user_type: 'trader' | 'employee';
+  user_type: UserType;
   bitcoin_address?: string;
 }
 
@@ -77,7 +78,7 @@ export async function signIn(username: string, password: string): Promise<{ user
 export async function signUp(
   username: string,
   password: string,
-  userType: 'trader' | 'employee',
+  userType: UserType,
   bitcoinAddress?: string
 ): Promise<{ user: User | null; session: Session | null; error?: Error }> {
   try {
@@ -91,9 +92,9 @@ export async function signUp(
       throw new Error('Password must be at least 8 characters');
     }
     
-    // Additional validation for employee
-    if (userType === 'employee' && !bitcoinAddress) {
-      throw new Error('Bitcoin address is required for employees');
+    // Additional validation for employee and admin
+    if ((userType === 'employee' || userType === 'admin') && !bitcoinAddress) {
+      throw new Error('Bitcoin address is required for employees and admins');
     }
     
     // Check if username already exists

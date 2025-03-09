@@ -4,18 +4,19 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import InsightCard from "@/components/ui/InsightCard";
 import { containerVariants, itemVariants } from "@/utils/animationVariants";
+import { usePermissions } from "@/hooks/use-permissions";
+import { useAuth } from "@/context/AuthContext";
 
 type InsightsSectionProps = {
   companyId?: string;
-  isEmployee?: boolean;
-  isSignedIn?: boolean;
 };
 
 const InsightsSection = ({
   companyId,
-  isEmployee = false,
-  isSignedIn = false,
 }: InsightsSectionProps) => {
+  const { user } = useAuth();
+  const { canVoteOnInsights } = usePermissions();
+
   // Set up real-time subscription for vote updates
   useEffect(() => {
     if (!companyId) return;
@@ -61,8 +62,8 @@ const InsightsSection = ({
           sourcesCount={5}
           lastUpdated="2 hours ago"
           companyId={companyId}
-          isEmployee={isEmployee}
-          isSignedIn={isSignedIn}
+          canVote={canVoteOnInsights}
+          isSignedIn={!!user}
         />
       </motion.div>
       
@@ -75,8 +76,8 @@ const InsightsSection = ({
           sourcesCount={3}
           lastUpdated="1 day ago"
           companyId={companyId}
-          isEmployee={isEmployee}
-          isSignedIn={isSignedIn}
+          canVote={canVoteOnInsights}
+          isSignedIn={!!user}
         />
       </motion.div>
       
@@ -89,8 +90,8 @@ const InsightsSection = ({
           sourcesCount={8}
           lastUpdated="5 days ago"
           companyId={companyId}
-          isEmployee={isEmployee}
-          isSignedIn={isSignedIn}
+          canVote={canVoteOnInsights}
+          isSignedIn={!!user}
         />
       </motion.div>
       
@@ -103,8 +104,8 @@ const InsightsSection = ({
           sourcesCount={4}
           lastUpdated="3 hours ago"
           companyId={companyId}
-          isEmployee={isEmployee}
-          isSignedIn={isSignedIn}
+          canVote={canVoteOnInsights}
+          isSignedIn={!!user}
         />
       </motion.div>
     </motion.div>
