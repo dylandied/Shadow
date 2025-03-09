@@ -26,7 +26,6 @@ const Company = () => {
   // For demo purposes, simulate whether user is an employee
   const [isEmployee, setIsEmployee] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const [userCompanyId, setUserCompanyId] = useState<string | null>(null);
   
   useEffect(() => {
     // Simulate data fetching
@@ -58,26 +57,8 @@ const Company = () => {
       setComments(sortedComments);
       
       // For demo, randomly decide if the user is signed in and an employee
-      const isUserSignedIn = Math.random() > 0.5;
-      const isUserEmployee = Math.random() > 0.7;
-      setIsSignedIn(isUserSignedIn);
-      setIsEmployee(isUserEmployee);
-      
-      // If the user is an employee, assign them to a company (50% chance it's the current company)
-      if (isUserEmployee && isUserSignedIn) {
-        if (Math.random() > 0.5) {
-          setUserCompanyId(id);
-        } else {
-          // Assign them to a different random company
-          const otherCompanies = mockCompanies.filter(c => c.id !== id);
-          if (otherCompanies.length > 0) {
-            const randomCompany = otherCompanies[Math.floor(Math.random() * otherCompanies.length)];
-            setUserCompanyId(randomCompany.id);
-          }
-        }
-      } else {
-        setUserCompanyId(null);
-      }
+      setIsSignedIn(Math.random() > 0.5);
+      setIsEmployee(Math.random() > 0.7);
       
       setLoading(false);
     };
@@ -146,16 +127,6 @@ const Company = () => {
       return;
     }
     
-    // Check if employee is assigned to this company
-    if (isEmployee && userCompanyId && userCompanyId !== id) {
-      toast({
-        title: "Company restriction",
-        description: "As an employee, you can only comment on your assigned company.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
     // Create a new comment object
     const newComment: Comment = {
       id: `comment-${Date.now()}`,
@@ -202,21 +173,10 @@ const Company = () => {
   return (
     <div className="container mx-auto px-3 sm:px-4 pt-20 sm:pt-24 pb-16">
       <CompanyHeader company={company} />
-      
-      {isEmployee && userCompanyId && userCompanyId !== id && (
-        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-          <p className="text-amber-800">
-            <strong>Notice:</strong> As an employee of another company, you can only view but not interact with this company's data. 
-            If you've changed jobs, please create a new account.
-          </p>
-        </div>
-      )}
-      
       <InsightsSection 
         companyId={company.id}
         isEmployee={isEmployee}
         isSignedIn={isSignedIn}
-        userCompanyId={userCompanyId}
       />
       <DiscussionSection 
         comments={comments}
@@ -225,8 +185,6 @@ const Company = () => {
         onSubmitComment={handleSubmitComment}
         isEmployee={isEmployee}
         isSignedIn={isSignedIn}
-        companyId={company.id}
-        userCompanyId={userCompanyId}
       />
     </div>
   );

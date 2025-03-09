@@ -10,8 +10,7 @@ export function useInsightVote(
   companyId?: string,
   insightType?: InsightType,
   isSignedIn = false,
-  isEmployee = false,
-  userCompanyId: string | null = null
+  isEmployee = false
 ) {
   const [userVote, setUserVote] = useState<VoteType>(null);
   const [lastVoteDate, setLastVoteDate] = useState<Date | null>(null);
@@ -95,16 +94,6 @@ export function useInsightVote(
       toast({
         title: "Employee access required",
         description: "Only employees can vote on company insights.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // Check if employee is voting on their assigned company
-    if (isEmployee && userCompanyId && userCompanyId !== companyId) {
-      toast({
-        title: "Company restriction",
-        description: "As an employee, you can only vote on insights for your assigned company.",
         variant: "destructive",
       });
       return;

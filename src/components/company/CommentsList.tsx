@@ -1,46 +1,38 @@
 
-import { Comment as CommentType } from "@/types";
 import Comment from "@/components/ui/Comment";
+import { Comment as CommentType } from "@/types";
 
 type CommentsListProps = {
   comments: CommentType[];
   isSignedIn?: boolean;
-  userIsEmployee?: boolean;
-  userCompanyId?: string | null;
 };
 
-const CommentsList = ({ 
-  comments, 
-  isSignedIn = false,
-  userIsEmployee = false,
-  userCompanyId = null
-}: CommentsListProps) => {
+const CommentsList = ({ comments, isSignedIn = false }: CommentsListProps) => {
   if (comments.length === 0) {
     return (
-      <div className="py-8 text-center text-muted-foreground">
-        <p>No comments yet. Be the first to share your insights.</p>
+      <div className="text-center py-6 sm:py-8">
+        <p className="text-muted-foreground">
+          No comments yet. Be the first to share an insight!
+        </p>
       </div>
     );
   }
-
+  
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {comments.map((comment) => (
         <Comment
           key={comment.id}
           id={comment.id}
           username={comment.username}
           content={comment.content}
-          bitcoinAddress={comment.bitcoinAddress}
+          bitcoinAddress={comment.isEmployee ? comment.bitcoinAddress : undefined}
           isEmployee={comment.isEmployee}
           upvotes={comment.upvotes}
           downvotes={comment.downvotes}
           timestamp={comment.timestamp}
           userReputation={comment.userReputation}
           isSignedIn={isSignedIn}
-          companyId={comment.companyId}
-          userIsEmployee={userIsEmployee}
-          userCompanyId={userCompanyId}
         />
       ))}
     </div>

@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, UserPlus, Bitcoin } from "lucide-react";
 import { z } from "zod";
@@ -26,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+// Define schemas for form validation
 const userBaseSchema = z.object({
   username: z
     .string()
@@ -60,28 +62,8 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   const navigate = useNavigate();
   const [userType, setUserType] = useState<"trader" | "employee">("trader");
   const [isLogin, setIsLogin] = useState(true);
-  const [companySelection, setCompanySelection] = useState<string>("");
-  const [companies, setCompanies] = useState<{ id: string, name: string, ticker: string }[]>([]);
   
-  useEffect(() => {
-    const fetchCompanies = async () => {
-      try {
-        const { mockCompanies } = await import("@/data/mockData");
-        setCompanies(mockCompanies.map(c => ({ 
-          id: c.id, 
-          name: c.name,
-          ticker: c.ticker
-        })));
-      } catch (error) {
-        console.error("Error fetching companies:", error);
-      }
-    };
-    
-    if (userType === "employee" && !isLogin) {
-      fetchCompanies();
-    }
-  }, [userType, isLogin]);
-  
+  // Initialize forms for both user types
   const traderForm = useForm<z.infer<typeof traderSchema>>({
     resolver: zodResolver(traderSchema),
     defaultValues: {
@@ -101,21 +83,19 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   
   const onSubmit = async (data: any) => {
     try {
-      const usernameExists = Math.random() > 0.8;
+      // Simulate checking if username exists
+      const usernameExists = Math.random() > 0.8; // 20% chance username exists (for demo)
       
       if (isLogin) {
+        // Login logic would go here
         console.log("Logging in:", data);
-        
-        if (userType === "employee") {
-          console.log("Employee login with company association would be validated");
-        }
-        
         toast({
           title: "Successfully logged in",
           description: `Welcome back, ${data.username}!`,
         });
         onOpenChange(false);
       } else {
+        // Signup logic
         if (usernameExists) {
           if (userType === "trader") {
             traderForm.setError("username", { 
@@ -129,21 +109,7 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
           return;
         }
         
-        if (userType === "employee" && !companySelection) {
-          toast({
-            title: "Company required",
-            description: "Please select the company you work for.",
-            variant: "destructive",
-          });
-          return;
-        }
-        
-        console.log("Signing up:", {
-          ...data,
-          userType,
-          companyId: userType === "employee" ? companySelection : null
-        });
-        
+        console.log("Signing up:", data);
         toast({
           title: "Account created",
           description: `Welcome to Insider Edge, ${data.username}!`,
@@ -174,23 +140,25 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
           </DialogDescription>
         </DialogHeader>
         
-        <Tabs 
-          defaultValue="trader" 
-          value={userType} 
-          onValueChange={(v) => setUserType(v as "trader" | "employee")}
-          className="w-full"
-        >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="trader" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              <span>Trader/Investor</span>
-            </TabsTrigger>
-            <TabsTrigger value="employee" className="flex items-center gap-2">
-              <UserPlus className="h-4 w-4" />
-              <span>Employee</span>
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        {!isLogin && (
+          <Tabs 
+            defaultValue="trader" 
+            value={userType} 
+            onValueChange={(v) => setUserType(v as "trader" | "employee")}
+            className="w-full"
+          >
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="trader" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                <span>Trader/Investor</span>
+              </TabsTrigger>
+              <TabsTrigger value="employee" className="flex items-center gap-2">
+                <UserPlus className="h-4 w-4" />
+                <span>Employee</span>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        )}
         
         {userType === "trader" ? (
           <Form {...traderForm}>
@@ -287,30 +255,6 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                   </FormItem>
                 )}
               />
-              
-              {!isLogin && userType === "employee" && (
-                <div className="space-y-2">
-                  <FormLabel>Company You Work For</FormLabel>
-                  <select
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    value={companySelection}
-                    onChange={(e) => setCompanySelection(e.target.value)}
-                  >
-                    <option value="">Select your company</option>
-                    {companies.map(company => (
-                      <option key={company.id} value={company.id}>
-                        {company.name} ({company.ticker})
-                      </option>
-                    ))}
-                  </select>
-                  {!companySelection && (
-                    <p className="text-xs text-muted-foreground">
-                      You must select the company you work for. 
-                      You'll only be able to comment and vote on this company.
-                    </p>
-                  )}
-                </div>
-              )}
               
               <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0 mt-5">
                 <Button 
