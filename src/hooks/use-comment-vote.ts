@@ -36,12 +36,18 @@ export function useCommentVote({
       const { data: session } = await supabase.auth.getSession();
       if (!session?.session?.user) return;
       
-      const { data } = await supabase
+      // Using raw SQL query as a workaround since comment_votes table isn't in the TypeScript types
+      const { data, error } = await supabase
         .from('comment_votes')
         .select('vote_type')
         .eq('comment_id', commentId)
         .eq('user_id', session.session.user.id)
         .maybeSingle();
+      
+      if (error) {
+        console.error('Error fetching vote:', error);
+        return;
+      }
       
       if (data) {
         setUserVote(data.vote_type as VoteType);
@@ -75,11 +81,16 @@ export function useCommentVote({
       
       // If user clicks on the same vote type they already selected, remove their vote
       if (userVote === voteType) {
-        await supabase
-          .from('comment_votes')
-          .delete()
-          .eq('comment_id', commentId)
-          .eq('user_id', session.session.user.id);
+        // Using raw SQL query as workaround
+        const { error } = await supabase
+          .rpc('delete_comment_vote', {
+            p_comment_id: commentId,
+            p_user_id: session.session.user.id
+          });
+          
+        if (error) {
+          throw error;
+        }
           
         // Update local state
         if (voteType === 'up') {
@@ -91,14 +102,17 @@ export function useCommentVote({
       } 
       // If user is changing their vote from one type to another
       else if (userVote !== null) {
-        await supabase
-          .from('comment_votes')
-          .update({ 
-            vote_type: voteType,
-            updated_at: new Date().toISOString() 
-          })
-          .eq('comment_id', commentId)
-          .eq('user_id', session.session.user.id);
+        // Using raw SQL query as workaround
+        const { error } = await supabase
+          .rpc('update_comment_vote', { 
+            p_comment_id: commentId,
+            p_user_id: session.session.user.id,
+            p_vote_type: voteType
+          });
+        
+        if (error) {
+          throw error;
+        }
         
         // Update local state
         if (voteType === 'up') {
@@ -112,13 +126,17 @@ export function useCommentVote({
       } 
       // If user is voting for the first time
       else {
-        await supabase
-          .from('comment_votes')
-          .insert({
-            comment_id: commentId,
-            user_id: session.session.user.id,
-            vote_type: voteType
+        // Using raw SQL query as workaround
+        const { error } = await supabase
+          .rpc('insert_comment_vote', {
+            p_comment_id: commentId,
+            p_user_id: session.session.user.id,
+            p_vote_type: voteType
           });
+        
+        if (error) {
+          throw error;
+        }
         
         // Update local state
         if (voteType === 'up') {
