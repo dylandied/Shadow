@@ -77,8 +77,12 @@ const CompanyHeader = ({ company }: CompanyHeaderProps) => {
             </div>
           )}
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">{company.name}</h1>
-            <p className="text-sm text-muted-foreground">{company.ticker} • {company.industry}</p>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1">
+              {company.name}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {company.ticker} • {company.industry}
+            </p>
           </div>
         </div>
         
