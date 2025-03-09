@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,14 +36,12 @@ const InsightCard = ({
   const [canVoteAgain, setCanVoteAgain] = useState(true);
   const [votesLoading, setVotesLoading] = useState(false);
 
-  // Get user's previous vote if they're signed in
   useEffect(() => {
     if (isSignedIn && companyId) {
       fetchUserVote();
     }
   }, [isSignedIn, companyId, type]);
 
-  // Check if a week has passed since the last vote
   useEffect(() => {
     if (lastVoteDate) {
       const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
@@ -75,7 +72,6 @@ const InsightCard = ({
         
         if (data) {
           setUserVote(data.vote as "up" | "down");
-          // Use the updated_at time to determine when they can vote again
           setLastVoteDate(new Date(data.updated_at));
         }
       }
@@ -106,14 +102,12 @@ const InsightCard = ({
     }
     
     if (!canVoteAgain && userVote !== vote) {
-      // If they can't vote again but they're changing their vote, allow it
       const timeRemaining = getTimeUntilNextVote();
       toast({
         title: "Vote changed",
         description: `You've changed your vote. You can change it again or vote on a different insight in ${timeRemaining}.`,
       });
     } else if (!canVoteAgain) {
-      // If they can't vote again and they're voting the same way
       const timeRemaining = getTimeUntilNextVote();
       toast({
         title: "Voting limit reached",
@@ -137,7 +131,6 @@ const InsightCard = ({
         company_id: companyId,
       };
       
-      // Check if user has already voted on this insight
       const { data: existingVote } = await supabase
         .from('insight_votes')
         .select('id')
@@ -147,7 +140,6 @@ const InsightCard = ({
         .maybeSingle();
       
       if (existingVote) {
-        // Update existing vote
         await supabase
           .from('insight_votes')
           .update({ 
@@ -163,7 +155,6 @@ const InsightCard = ({
             : "You voted that this metric has declined",
         });
       } else {
-        // Insert new vote
         await supabase
           .from('insight_votes')
           .insert(voteData);
@@ -176,7 +167,6 @@ const InsightCard = ({
         });
       }
       
-      // Update UI state
       setUserVote(vote);
       setLastVoteDate(new Date());
       setCanVoteAgain(false);
@@ -217,16 +207,13 @@ const InsightCard = ({
       className="insight-card rounded-xl"
     >
       <div className="p-5">
-        {/* Card Header */}
         <div className="flex justify-between items-start mb-3">
           <InsightIcon type={type} change={change} />
           <TrendIndicator change={change} type={type} />
         </div>
         
-        {/* Card Content */}
         <InsightContent title={title} value={value} change={change} />
         
-        {/* Voting Buttons */}
         {companyId && (
           <InsightVoteButtons
             isSignedIn={isSignedIn}
@@ -239,8 +226,12 @@ const InsightCard = ({
           />
         )}
         
-        {/* Card Footer */}
-        <InsightFooter sourcesCount={sourcesCount} lastUpdated={lastUpdated} />
+        <InsightFooter 
+          sourcesCount={sourcesCount} 
+          lastUpdated={lastUpdated} 
+          companyId={companyId}
+          insightType={type}
+        />
       </div>
     </motion.div>
   );

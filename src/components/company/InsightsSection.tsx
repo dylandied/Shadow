@@ -1,5 +1,7 @@
 
 import { motion } from "framer-motion";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import InsightCard from "@/components/ui/InsightCard";
 import { containerVariants, itemVariants } from "@/utils/animationVariants";
 
@@ -14,6 +16,35 @@ const InsightsSection = ({
   isEmployee = false,
   isSignedIn = false,
 }: InsightsSectionProps) => {
+  // Set up real-time subscription for vote updates
+  useEffect(() => {
+    if (!companyId) return;
+
+    // Subscribe to changes in the insight_votes table for this company
+    const channel = supabase
+      .channel('insight-votes-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen for all changes (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'insight_votes',
+          filter: `company_id=eq.${companyId}`
+        },
+        (payload) => {
+          // When a vote changes, we don't need to do anything specific here
+          // The InsightFooter component will re-fetch the vote count
+          console.log('Vote update:', payload);
+        }
+      )
+      .subscribe();
+
+    // Clean up subscription when component unmounts
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [companyId]);
+
   return (
     <motion.div
       variants={containerVariants}
