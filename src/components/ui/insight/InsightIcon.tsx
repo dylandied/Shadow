@@ -1,5 +1,5 @@
 
-import { ShoppingBag, Users, MessageSquare } from "lucide-react";
+import { ShoppingBag, Users, MessageSquare, Megaphone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getTrendStyles, ChangeDirection } from "./TrendIndicator";
 
@@ -20,8 +20,9 @@ const InsightIcon = ({ type, change }: InsightIconProps) => {
       case "traffic":
         return <Users className="h-5 w-5" />;
       case "satisfaction":
-      case "news":
         return <MessageSquare className="h-5 w-5" />;
+      case "news":
+        return <Megaphone className="h-5 w-5" />;
       default:
         return <ShoppingBag className="h-5 w-5" />;
     }
