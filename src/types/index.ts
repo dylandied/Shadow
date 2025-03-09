@@ -44,4 +44,4 @@ export type Insight = {
   lastUpdated: string;
 };
 
-export type SortOption = "newest" | "oldest" | "most_upvoted" | "most_discussed";
+export type SortOption = "newest" | "oldest" | "most_upvoted" | "most_discussed" | "recent" | "upvoted" | "tipped";

@@ -10,7 +10,7 @@ import {
   signUp as authSignUp,
   signOut as authSignOut,
   updateBitcoinAddress as authUpdateBitcoinAddress
-} from '@/hooks/use-auth-api';
+} from '@/hooks/auth';
 import { UserType } from '@/types';
 
 interface AuthContextType {
