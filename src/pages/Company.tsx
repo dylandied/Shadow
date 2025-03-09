@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { mockCompanies, mockComments } from "@/data/mockData";
+import { toast } from "@/hooks/use-toast";
 
 // Import refactored components
 import CompanyHeader from "@/components/company/CompanyHeader";
@@ -66,6 +67,29 @@ const Company = () => {
   const handleSubmitComment = (content: string) => {
     // In a real application, this would make an API call to save the comment
     console.log("New comment:", content);
+    
+    // Create a new comment object
+    const newComment = {
+      id: `comment-${Date.now()}`,
+      companyId: id,
+      username: "Current User",
+      content: content,
+      isEmployee: isEmployee,
+      upvotes: 0,
+      downvotes: 0,
+      timestamp: new Date(),
+      userReputation: "trusted"
+    };
+    
+    // Add the new comment to the list
+    const updatedComments = [newComment, ...comments];
+    setComments(updatedComments);
+    
+    // Show a toast notification
+    toast({
+      title: "Comment posted",
+      description: "Your comment has been successfully posted.",
+    });
   };
   
   if (loading) {

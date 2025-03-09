@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 
 type CommentFormProps = {
   onSubmit: (content: string) => void;
+  commentsRemaining?: number;
 };
 
-const CommentForm = ({ onSubmit }: CommentFormProps) => {
+const CommentForm = ({ onSubmit, commentsRemaining = 3 }: CommentFormProps) => {
   const [commentText, setCommentText] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -29,7 +30,10 @@ const CommentForm = ({ onSubmit }: CommentFormProps) => {
             onChange={(e) => setCommentText(e.target.value)}
           />
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-between items-center">
+          <p className="text-xs text-muted-foreground">
+            {commentsRemaining} comment{commentsRemaining !== 1 ? 's' : ''} remaining today
+          </p>
           <Button type="submit" disabled={!commentText.trim()} size="sm" className="sm:h-10">
             Post Comment
           </Button>
