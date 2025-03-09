@@ -7,74 +7,39 @@
   :root {
     --radius: 0.5rem;
 
-    /* Base theme */
-    --background: 0 0% 100%;
-    --foreground: 210 20% 13%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 210 20% 13%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 210 20% 13%;
-
-    --primary: 210 25% 15%;
-    --primary-foreground: 0 0% 98%;
-
-    --secondary: 210 20% 96%;
-    --secondary-foreground: 210 25% 15%;
-
-    --muted: 210 20% 96%;
-    --muted-foreground: 215 20% 45%;
-
-    --accent: 210 25% 93%;
-    --accent-foreground: 210 25% 15%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 210 20% 90%;
-    --input: 210 20% 90%;
-    --ring: 210 25% 35%;
-
-    /* Insight colors */
-    --insight-positive: 142 72% 29%;
-    --insight-negative: 358 75% 59%;
-    --insight-neutral: 205 70% 41%;
-  }
-
-  .dark {
+    /* Dark theme - now the default */
     --background: 210 25% 12%;
-    --foreground: 210 20% 98%;
+    --foreground: 0 0% 98%;
 
     --card: 210 25% 15%;
-    --card-foreground: 210 20% 98%;
+    --card-foreground: 0 0% 98%;
 
     --popover: 210 25% 15%;
-    --popover-foreground: 210 20% 98%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 210 20% 98%;
+    --primary: 142 70% 45%; /* Green primary */
     --primary-foreground: 210 25% 12%;
 
     --secondary: 210 25% 18%;
-    --secondary-foreground: 210 20% 98%;
+    --secondary-foreground: 0 0% 98%;
 
     --muted: 210 25% 18%;
     --muted-foreground: 215 20% 65%;
 
-    --accent: 210 25% 22%;
-    --accent-foreground: 210 20% 98%;
+    --accent: 142 70% 45%; /* Green accent */
+    --accent-foreground: 0 0% 98%;
 
     --destructive: 0 74% 42%;
-    --destructive-foreground: 210 20% 98%;
+    --destructive-foreground: 0 0% 98%;
 
     --border: 210 25% 25%;
     --input: 210 25% 25%;
-    --ring: 210 20% 60%;
+    --ring: 142 70% 45%; /* Green ring */
 
-    /* Insight colors - dark mode */
-    --insight-positive: 142 72% 40%;
+    /* Insight colors - using green and white palette */
+    --insight-positive: 142 72% 50%;
     --insight-negative: 358 75% 65%;
-    --insight-neutral: 205 70% 55%;
+    --insight-neutral: 142 30% 65%;
   }
 }
 
@@ -121,15 +86,15 @@
   }
 
   .badge-insider {
-    @apply badge bg-primary/10 text-primary;
+    @apply badge bg-primary/20 text-primary;
   }
   
   .badge-hot {
-    @apply badge bg-insight-positive/10 text-insight-positive animate-pulse-subtle;
+    @apply badge bg-insight-positive/20 text-insight-positive animate-pulse-subtle;
   }
   
   .badge-new {
-    @apply badge bg-insight-neutral/10 text-insight-neutral;
+    @apply badge bg-insight-neutral/20 text-insight-neutral;
   }
 }
 
