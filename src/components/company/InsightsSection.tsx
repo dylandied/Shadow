@@ -48,7 +48,7 @@ const InsightsSection = () => {
         <InsightCard
           type="news"
           title="Upcoming News"
-          value="Good"
+          value="Positive"
           change="up"
           sourcesCount={4}
           lastUpdated="3 hours ago"
