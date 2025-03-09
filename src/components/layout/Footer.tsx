@@ -72,6 +72,32 @@ const Footer = () => {
           </DialogHeader>
           
           <div className="mt-4 text-sm space-y-4">
+            <p className="font-medium text-base text-foreground">
+              By accessing, viewing, or using this site, you agree to be bound by these Terms and Conditions.
+            </p>
+            
+            <h3 className="font-semibold text-base">Legal Compliance</h3>
+            <p>
+              InsiderEdge expressly states that:
+            </p>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>We do not encourage, condone, or support insider trading or any other illegal activities.</li>
+              <li>Users must only share information that is publicly available and not subject to non-disclosure agreements (NDAs).</li>
+              <li>The sharing of trade secrets or engagement in corporate espionage is strictly prohibited.</li>
+              <li>All information shared on this platform should be legally obtained and shared in compliance with applicable securities laws and regulations.</li>
+              <li>Users are solely responsible for ensuring their compliance with all applicable laws when using this platform.</li>
+            </ul>
+            
+            <h3 className="font-semibold text-base">Acceptance of Terms</h3>
+            <p>
+              By merely viewing this website, you acknowledge and agree that:
+            </p>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>You have read, understood, and agree to be bound by these Terms and Conditions in their entirety.</li>
+              <li>If you do not agree with any part of these terms, you must immediately cease using this website.</li>
+              <li>These terms constitute a legally binding agreement between you and InsiderEdge.</li>
+            </ul>
+            
             <h3 className="font-semibold text-base">Risk Disclosure</h3>
             <p>
               By using InsiderEdge, you acknowledge and accept that:
@@ -84,7 +110,7 @@ const Footer = () => {
               <li>Users are solely responsible for their investment decisions and should conduct their own research or consult with qualified professionals before making any investment.</li>
             </ul>
             
-            <h3 className="font-semibold text-base mt-6">Intellectual Property Protection</h3>
+            <h3 className="font-semibold text-base">Intellectual Property Protection</h3>
             <p>
               By accessing or using this platform, you acknowledge and agree that:
             </p>
@@ -95,7 +121,7 @@ const Footer = () => {
               <li>The platform's design, logo, content, and underlying technology are protected by copyright, trademark, patent, trade secret, and other intellectual property laws.</li>
             </ul>
             
-            <h3 className="font-semibold text-base mt-6">User Conduct</h3>
+            <h3 className="font-semibold text-base">User Conduct</h3>
             <p>
               Users of InsiderEdge agree to:
             </p>
