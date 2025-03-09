@@ -3,7 +3,17 @@ import { motion } from "framer-motion";
 import InsightCard from "@/components/ui/InsightCard";
 import { containerVariants, itemVariants } from "@/utils/animationVariants";
 
-const InsightsSection = () => {
+type InsightsSectionProps = {
+  companyId?: string;
+  isEmployee?: boolean;
+  isSignedIn?: boolean;
+};
+
+const InsightsSection = ({
+  companyId,
+  isEmployee = false,
+  isSignedIn = false,
+}: InsightsSectionProps) => {
   return (
     <motion.div
       variants={containerVariants}
@@ -19,6 +29,9 @@ const InsightsSection = () => {
           change="up"
           sourcesCount={5}
           lastUpdated="2 hours ago"
+          companyId={companyId}
+          isEmployee={isEmployee}
+          isSignedIn={isSignedIn}
         />
       </motion.div>
       
@@ -30,6 +43,9 @@ const InsightsSection = () => {
           change="down"
           sourcesCount={3}
           lastUpdated="1 day ago"
+          companyId={companyId}
+          isEmployee={isEmployee}
+          isSignedIn={isSignedIn}
         />
       </motion.div>
       
@@ -41,6 +57,9 @@ const InsightsSection = () => {
           change="up"
           sourcesCount={8}
           lastUpdated="5 days ago"
+          companyId={companyId}
+          isEmployee={isEmployee}
+          isSignedIn={isSignedIn}
         />
       </motion.div>
       
@@ -52,6 +71,9 @@ const InsightsSection = () => {
           change="up"
           sourcesCount={4}
           lastUpdated="3 hours ago"
+          companyId={companyId}
+          isEmployee={isEmployee}
+          isSignedIn={isSignedIn}
         />
       </motion.div>
     </motion.div>

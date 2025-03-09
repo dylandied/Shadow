@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { mockCompanies, mockComments } from "@/data/mockData";
@@ -103,7 +102,11 @@ const Company = () => {
   return (
     <div className="container mx-auto px-3 sm:px-4 pt-20 sm:pt-24 pb-16">
       <CompanyHeader company={company} />
-      <InsightsSection />
+      <InsightsSection 
+        companyId={company.id}
+        isEmployee={isEmployee}
+        isSignedIn={isSignedIn}
+      />
       <DiscussionSection 
         comments={comments}
         sortBy={sortBy}

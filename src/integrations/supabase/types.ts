@@ -80,6 +80,44 @@ export type Database = {
         }
         Relationships: []
       }
+      insight_votes: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          insight_type: string
+          updated_at: string
+          user_id: string
+          vote: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          insight_type: string
+          updated_at?: string
+          user_id: string
+          vote: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          insight_type?: string
+          updated_at?: string
+          user_id?: string
+          vote?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insight_votes_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           banned: boolean | null
