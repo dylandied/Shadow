@@ -1,27 +1,21 @@
 
-import { useAuth } from '@/context/AuthContext';
-
 export function usePermissions() {
-  const { user, profile } = useAuth();
-  
-  const isAuthenticated = !!user;
-  const userType = profile?.user_type as "trader" | "employee" | "admin" | undefined;
-  
+  // All permissions are now granted to everyone
   return {
     // Comment permissions
-    canComment: isAuthenticated && (userType === 'employee' || userType === 'admin'),
-    canDeleteComments: isAuthenticated && userType === 'admin',
+    canComment: true,
+    canDeleteComments: true,
     
     // Company permissions
-    canAddCompanies: isAuthenticated && (userType === 'employee' || userType === 'admin'),
-    canDeleteCompanies: isAuthenticated && userType === 'admin',
+    canAddCompanies: true,
+    canDeleteCompanies: true,
     
     // Voting permissions
-    canVoteOnInsights: isAuthenticated && (userType === 'employee' || userType === 'admin'),
-    canVoteOnComments: isAuthenticated, // Any authenticated user can vote on comments
+    canVoteOnInsights: true,
+    canVoteOnComments: true,
     
-    // General authentication status
-    isAuthenticated,
-    userType,
+    // Everyone is authenticated for compatibility
+    isAuthenticated: true,
+    userType: 'admin',
   };
 }
