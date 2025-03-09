@@ -1,10 +1,8 @@
 
 import { formatDistanceToNow } from "date-fns";
-import { Bitcoin } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
 import UserBadge from "../UserBadge";
 import { cn } from "@/lib/utils";
+import TipButton from "../TipButton";
 
 type CommentHeaderProps = {
   username: string;
@@ -23,16 +21,6 @@ const CommentHeader = ({
   bitcoinAddress,
   className,
 }: CommentHeaderProps) => {
-  const handleCopyBitcoinAddress = () => {
-    if (bitcoinAddress) {
-      navigator.clipboard.writeText(bitcoinAddress);
-      toast({
-        title: "Address Copied",
-        description: "Bitcoin address copied to clipboard.",
-      });
-    }
-  };
-
   return (
     <div className={cn("flex justify-between items-start", className)}>
       <div className="flex items-center">
@@ -49,15 +37,7 @@ const CommentHeader = ({
       </div>
       
       {isEmployee && bitcoinAddress && (
-        <Button
-          variant="outline"
-          size="sm"
-          className="text-xs flex items-center space-x-1"
-          onClick={handleCopyBitcoinAddress}
-        >
-          <Bitcoin className="h-3 w-3" />
-          <span className="hidden sm:inline">Copy Address</span>
-        </Button>
+        <TipButton bitcoinAddress={bitcoinAddress} size="sm" />
       )}
     </div>
   );
