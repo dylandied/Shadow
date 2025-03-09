@@ -1,9 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { mockCompanies, mockComments } from "@/data/mockData";
 import { toast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 // Import refactored components
 import CompanyHeader from "@/components/company/CompanyHeader";
@@ -42,106 +40,6 @@ const Company = () => {
     }, 500);
   }, [id]);
   
-  useEffect(() => {
-    if (!company || !id) return;
-    
-    // Subscribe to real-time company updates
-    const companyChannel = supabase
-      .channel('company-detail-updates')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'companies',
-          filter: `id=eq.${id}`
-        },
-        (payload) => {
-          if (payload.new) {
-            setCompany(prevCompany => ({
-              ...prevCompany,
-              ...payload.new,
-              lastUpdate: payload.new.last_update ? new Date(payload.new.last_update) : prevCompany.lastUpdate,
-            }));
-          }
-        }
-      )
-      .subscribe();
-      
-    // Subscribe to real-time comment updates
-    const commentsChannel = supabase
-      .channel('company-comments-updates')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'comments',
-          filter: `company_id=eq.${id}`
-        },
-        (payload) => {
-          if (payload.eventType === 'INSERT' && payload.new) {
-            // Add new comment to the list
-            const newComment = {
-              id: payload.new.id,
-              companyId: payload.new.company_id,
-              content: payload.new.content,
-              username: "Employee", // In a real app, you'd get this from payload or a separate query
-              isEmployee: true,
-              upvotes: payload.new.upvotes || 0,
-              downvotes: payload.new.downvotes || 0,
-              timestamp: new Date(payload.new.created_at),
-              userReputation: "trusted",
-              replies: []
-            };
-            
-            setComments(prevComments => {
-              const updatedComments = [newComment, ...prevComments];
-              sortComments(updatedComments, sortBy);
-              return updatedComments;
-            });
-            
-            // Update company metadata
-            setCompany(prevCompany => ({
-              ...prevCompany,
-              insidersCount: prevCompany.insidersCount + 1,
-              postsCount: prevCompany.postsCount + 1,
-              lastUpdate: new Date()
-            }));
-          }
-        }
-      )
-      .subscribe();
-      
-    // Subscribe to real-time vote updates
-    const votesChannel = supabase
-      .channel('company-votes-updates')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'insight_votes',
-          filter: `company_id=eq.${id}`
-        },
-        () => {
-          // Update company insiders count for new votes
-          setCompany(prevCompany => ({
-            ...prevCompany,
-            insidersCount: prevCompany.insidersCount + 1,
-            lastUpdate: new Date()
-          }));
-        }
-      )
-      .subscribe();
-    
-    return () => {
-      supabase.removeChannel(companyChannel);
-      supabase.removeChannel(commentsChannel);
-      supabase.removeChannel(votesChannel);
-    };
-  }, [company, id, sortBy]);
-  
   const sortComments = (commentsToSort: any[], sortOption: string) => {
     let sorted;
     switch (sortOption) {
@@ -179,30 +77,18 @@ const Company = () => {
       upvotes: 0,
       downvotes: 0,
       timestamp: new Date(),
-      userReputation: "trusted",
-      replies: []
+      userReputation: "trusted"
     };
     
     // Add the new comment to the list
     const updatedComments = [newComment, ...comments];
     setComments(updatedComments);
     
-    // Update company metadata
-    setCompany(prevCompany => ({
-      ...prevCompany,
-      insidersCount: prevCompany.insidersCount + 1,
-      postsCount: prevCompany.postsCount + 1,
-      lastUpdate: new Date()
-    }));
-    
     // Show a toast notification
     toast({
       title: "Comment posted",
       description: "Your comment has been successfully posted.",
     });
-    
-    // In a real app, you would also trigger the database insert here
-    // which would then be picked up by the real-time subscription
   };
   
   if (loading) {
