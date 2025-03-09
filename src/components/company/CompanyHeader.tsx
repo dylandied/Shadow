@@ -2,12 +2,55 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Company } from "@/types";
 
 type CompanyHeaderProps = {
-  company: any;
+  company: Company;
 };
 
 const CompanyHeader = ({ company }: CompanyHeaderProps) => {
+  const [insidersCount, setInsidersCount] = useState(company.insidersCount);
+  const [lastUpdate, setLastUpdate] = useState(company.lastUpdate);
+
+  useEffect(() => {
+    // Subscribe to real-time updates
+    const channel = supabase
+      .channel('public:comments')
+      .on('postgres_changes', 
+        { event: 'INSERT', schema: 'public', table: 'comments', filter: `company_id=eq.${company.id}` },
+        (payload) => {
+          if (payload.new && payload.new.isEmployee) {
+            // Increment insider count if a new comment is from an employee
+            setInsidersCount(prevCount => prevCount + 1);
+            setLastUpdate(new Date());
+          }
+        }
+      )
+      .subscribe();
+
+    // Also subscribe to votes (for when employees vote)
+    const votesChannel = supabase
+      .channel('public:insight_votes')
+      .on('postgres_changes', 
+        { event: 'INSERT', schema: 'public', table: 'insight_votes', filter: `company_id=eq.${company.id}` },
+        (payload) => {
+          if (payload.new && payload.new.isEmployee) {
+            // Increment insider count if a new vote is from an employee
+            setInsidersCount(prevCount => prevCount + 1);
+            setLastUpdate(new Date());
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+      supabase.removeChannel(votesChannel);
+    };
+  }, [company.id]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -41,8 +84,8 @@ const CompanyHeader = ({ company }: CompanyHeaderProps) => {
         
         <div className="flex items-center space-x-2">
           <div className="text-xs sm:text-sm text-muted-foreground mr-2">
-            {company.insidersCount} {company.insidersCount === 1 ? "insider" : "insiders"} •
-            Last update: {company.lastUpdate.toLocaleDateString()}
+            {insidersCount} {insidersCount === 1 ? "insider" : "insiders"} •
+            Last update: {lastUpdate.toLocaleDateString()}
           </div>
           
           {company.isHot && (

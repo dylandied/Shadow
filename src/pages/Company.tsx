@@ -1,7 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { mockCompanies, mockComments } from "@/data/mockData";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 // Import refactored components
 import CompanyHeader from "@/components/company/CompanyHeader";
@@ -24,7 +26,17 @@ const Company = () => {
     // Simulate data fetching
     setTimeout(() => {
       const foundCompany = mockCompanies.find(c => c.id === id);
-      setCompany(foundCompany || null);
+      
+      if (foundCompany) {
+        // Create a copy of the company with the current timestamp
+        const companyWithCurrentTimestamp = {
+          ...foundCompany,
+          lastUpdate: new Date() // Update timestamp to now
+        };
+        setCompany(companyWithCurrentTimestamp);
+      } else {
+        setCompany(null);
+      }
       
       // Filter comments for this company
       const companyComments = mockComments.filter(c => c.companyId === id);
@@ -38,16 +50,44 @@ const Company = () => {
       
       setLoading(false);
     }, 500);
-  }, [id]);
+    
+    // Set up real-time listener for comments
+    if (id) {
+      const commentsChannel = supabase
+        .channel('comments-changes')
+        .on('postgres_changes', 
+          { event: 'INSERT', schema: 'public', table: 'comments', filter: `company_id=eq.${id}` },
+          (payload) => {
+            // Add new comment to the list and resort
+            const newComment = payload.new;
+            if (newComment) {
+              setComments(prevComments => {
+                const updatedComments = [...prevComments, newComment];
+                return sortCommentArray(updatedComments, sortBy);
+              });
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(commentsChannel);
+      };
+    }
+  }, [id, sortBy]);
   
-  const sortComments = (commentsToSort: any[], sortOption: string) => {
+  const sortCommentArray = (commentsToSort: any[], sortOption: string) => {
     let sorted;
     switch (sortOption) {
       case "upvoted":
         sorted = [...commentsToSort].sort((a, b) => b.upvotes - a.upvotes);
         break;
       case "recent":
-        sorted = [...commentsToSort].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+        sorted = [...commentsToSort].sort((a, b) => {
+          const dateA = a.timestamp ? new Date(a.timestamp) : new Date(0);
+          const dateB = b.timestamp ? new Date(b.timestamp) : new Date(0);
+          return dateB.getTime() - dateA.getTime();
+        });
         break;
       case "tipped":
         sorted = [...commentsToSort].sort((a, b) => b.tipAmount - a.tipAmount);
@@ -55,6 +95,11 @@ const Company = () => {
       default:
         sorted = commentsToSort;
     }
+    return sorted;
+  };
+  
+  const sortComments = (commentsToSort: any[], sortOption: string) => {
+    const sorted = sortCommentArray(commentsToSort, sortOption);
     setComments(sorted);
   };
   
@@ -83,6 +128,15 @@ const Company = () => {
     // Add the new comment to the list
     const updatedComments = [newComment, ...comments];
     setComments(updatedComments);
+    
+    // If the user is an employee, update the company's insider count and timestamp
+    if (isEmployee && company) {
+      setCompany(prev => ({
+        ...prev,
+        insidersCount: prev.insidersCount + 1,
+        lastUpdate: new Date()
+      }));
+    }
     
     // Show a toast notification
     toast({
