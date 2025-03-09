@@ -8,10 +8,12 @@ import {
   DialogTitle,
   DialogDescription
 } from "@/components/ui/dialog";
+import { AdminLoginDialog } from "@/components/ui/AdminLoginDialog";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const [showTerms, setShowTerms] = useState(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
   
   return (
     <footer className="border-t border-border mt-12">
@@ -46,6 +48,14 @@ const Footer = () => {
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Terms and Conditions
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => setShowAdminLogin(true)}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Admin
                 </button>
               </li>
             </ul>
@@ -141,6 +151,8 @@ const Footer = () => {
           </div>
         </DialogContent>
       </Dialog>
+      
+      <AdminLoginDialog open={showAdminLogin} onOpenChange={setShowAdminLogin} />
     </footer>
   );
 };

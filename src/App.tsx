@@ -13,6 +13,7 @@ import Home from "./pages/Home";
 import Company from "./pages/Company";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const AppRoutes = () => {
         <Route path="/" element={<Home />} />
         <Route path="/company/:id" element={<Company />} />
         <Route path="/about" element={<About />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
