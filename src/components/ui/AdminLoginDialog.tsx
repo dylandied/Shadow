@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 import {
   Dialog,
@@ -29,7 +30,7 @@ import { Button } from "@/components/ui/button";
 // Define schema for login form validation
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 type AdminLoginDialogProps = {
@@ -40,6 +41,7 @@ type AdminLoginDialogProps = {
 export function AdminLoginDialog({ open, onOpenChange }: AdminLoginDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { refreshProfile } = useAuth();
   
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -78,6 +80,8 @@ export function AdminLoginDialog({ open, onOpenChange }: AdminLoginDialogProps) 
         await supabase.auth.signOut();
         throw new Error('Not authorized as admin');
       }
+      
+      await refreshProfile();
       
       toast({
         title: "Admin login successful",
