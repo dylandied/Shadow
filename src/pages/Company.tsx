@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { mockCompanies, mockComments } from "@/data/mockData";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Comment, Company as CompanyType } from "@/types";
 
 // Import refactored components
 import CompanyHeader from "@/components/company/CompanyHeader";
@@ -12,19 +13,24 @@ import DiscussionSection from "@/components/company/DiscussionSection";
 import LoadingState from "@/components/company/LoadingState";
 import NotFoundState from "@/components/company/NotFoundState";
 
+// Available sort options
+type SortOption = "recent" | "upvoted" | "tipped";
+
 const Company = () => {
   const { id } = useParams<{ id: string }>();
-  const [company, setCompany] = useState<any>(null);
-  const [comments, setComments] = useState<any[]>([]);
+  const [company, setCompany] = useState<CompanyType | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sortBy, setSortBy] = useState("recent");
+  const [sortBy, setSortBy] = useState<SortOption>("recent");
+  
   // For demo purposes, simulate whether user is an employee
   const [isEmployee, setIsEmployee] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
   
   useEffect(() => {
     // Simulate data fetching
-    setTimeout(() => {
+    const fetchData = async () => {
+      // Find the company
       const foundCompany = mockCompanies.find(c => c.id === id);
       
       if (foundCompany) {
@@ -39,17 +45,25 @@ const Company = () => {
       }
       
       // Filter comments for this company
-      const companyComments = mockComments.filter(c => c.companyId === id);
+      const companyComments = mockComments
+        .filter(c => c.companyId === id)
+        .map(comment => ({
+          ...comment,
+          timestamp: new Date(comment.timestamp)
+        }));
       
       // Sort comments based on selected option
-      sortComments(companyComments, sortBy);
+      const sortedComments = sortCommentArray(companyComments, sortBy);
+      setComments(sortedComments);
       
       // For demo, randomly decide if the user is signed in and an employee
       setIsSignedIn(Math.random() > 0.5);
       setIsEmployee(Math.random() > 0.7);
       
       setLoading(false);
-    }, 500);
+    };
+    
+    fetchData();
     
     // Set up real-time listener for comments
     if (id) {
@@ -59,10 +73,13 @@ const Company = () => {
           { event: 'INSERT', schema: 'public', table: 'comments', filter: `company_id=eq.${id}` },
           (payload) => {
             // Add new comment to the list and resort
-            const newComment = payload.new;
+            const newComment = payload.new as Comment;
             if (newComment) {
               setComments(prevComments => {
-                const updatedComments = [...prevComments, newComment];
+                const updatedComments = [...prevComments, {
+                  ...newComment,
+                  timestamp: new Date(newComment.timestamp)
+                }];
                 return sortCommentArray(updatedComments, sortBy);
               });
             }
@@ -76,64 +93,64 @@ const Company = () => {
     }
   }, [id, sortBy]);
   
-  const sortCommentArray = (commentsToSort: any[], sortOption: string) => {
-    let sorted;
+  // Sort comments based on the selected option
+  const sortCommentArray = (commentsToSort: Comment[], sortOption: SortOption): Comment[] => {
     switch (sortOption) {
       case "upvoted":
-        sorted = [...commentsToSort].sort((a, b) => b.upvotes - a.upvotes);
-        break;
+        return [...commentsToSort].sort((a, b) => b.upvotes - a.upvotes);
       case "recent":
-        sorted = [...commentsToSort].sort((a, b) => {
-          const dateA = a.timestamp ? new Date(a.timestamp) : new Date(0);
-          const dateB = b.timestamp ? new Date(b.timestamp) : new Date(0);
+        return [...commentsToSort].sort((a, b) => {
+          const dateA = new Date(a.timestamp);
+          const dateB = new Date(b.timestamp);
           return dateB.getTime() - dateA.getTime();
         });
-        break;
       case "tipped":
-        sorted = [...commentsToSort].sort((a, b) => b.tipAmount - a.tipAmount);
-        break;
+        return [...commentsToSort].sort((a, b) => b.tipAmount - a.tipAmount);
       default:
-        sorted = commentsToSort;
+        return commentsToSort;
     }
-    return sorted;
   };
   
-  const sortComments = (commentsToSort: any[], sortOption: string) => {
-    const sorted = sortCommentArray(commentsToSort, sortOption);
-    setComments(sorted);
-  };
-  
+  // Handle sort option change
   const handleSortChange = (option: string) => {
-    setSortBy(option);
-    sortComments(comments, option);
+    setSortBy(option as SortOption);
   };
   
+  // Handle new comment submission
   const handleSubmitComment = (content: string) => {
-    // In a real application, this would make an API call to save the comment
-    console.log("New comment:", content);
+    if (!isSignedIn || !isEmployee) {
+      toast({
+        title: "Permission denied",
+        description: "Only signed-in employees can post comments.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     // Create a new comment object
-    const newComment = {
+    const newComment: Comment = {
       id: `comment-${Date.now()}`,
-      companyId: id,
+      companyId: id || '',
       username: "Current User",
       content: content,
       isEmployee: isEmployee,
       upvotes: 0,
       downvotes: 0,
       timestamp: new Date(),
-      userReputation: "trusted"
+      userReputation: "trusted",
+      replies: [],
+      tipAmount: 0
     };
     
     // Add the new comment to the list
     const updatedComments = [newComment, ...comments];
-    setComments(updatedComments);
+    setComments(sortCommentArray(updatedComments, sortBy));
     
     // If the user is an employee, update the company's insider count and timestamp
     if (isEmployee && company) {
       setCompany(prev => ({
-        ...prev,
-        insidersCount: prev.insidersCount + 1,
+        ...prev!,
+        insidersCount: prev!.insidersCount + 1,
         lastUpdate: new Date()
       }));
     }

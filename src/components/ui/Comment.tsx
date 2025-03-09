@@ -1,11 +1,10 @@
 
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import CommentHeader from "./comment/CommentHeader";
 import CommentBody from "./comment/CommentBody";
 import CommentActions from "./comment/CommentActions";
+import { useCommentVote } from "@/hooks/use-comment-vote";
 
 type CommentProps = {
   id: string;
@@ -37,53 +36,18 @@ const Comment = ({
   className,
   isSignedIn = false,
 }: CommentProps) => {
-  const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
-  const [localUpvotes, setLocalUpvotes] = useState(upvotes);
-  const [localDownvotes, setLocalDownvotes] = useState(downvotes);
-  
-  const handleUpvote = () => {
-    if (!isSignedIn) {
-      toast({
-        title: "Sign in required",
-        description: "You need to sign in to vote on comments.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (userVote === "up") {
-      setUserVote(null);
-      setLocalUpvotes(prev => prev - 1);
-    } else {
-      if (userVote === "down") {
-        setLocalDownvotes(prev => prev - 1);
-      }
-      setUserVote("up");
-      setLocalUpvotes(prev => prev + 1);
-    }
-  };
-  
-  const handleDownvote = () => {
-    if (!isSignedIn) {
-      toast({
-        title: "Sign in required",
-        description: "You need to sign in to vote on comments.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (userVote === "down") {
-      setUserVote(null);
-      setLocalDownvotes(prev => prev - 1);
-    } else {
-      if (userVote === "up") {
-        setLocalUpvotes(prev => prev - 1);
-      }
-      setUserVote("down");
-      setLocalDownvotes(prev => prev + 1);
-    }
-  };
+  const { 
+    userVote, 
+    upvotes: localUpvotes, 
+    downvotes: localDownvotes,
+    handleUpvote,
+    handleDownvote 
+  } = useCommentVote({
+    initialUpvotes: upvotes,
+    initialDownvotes: downvotes,
+    isSignedIn,
+    commentId: id
+  });
   
   return (
     <motion.div

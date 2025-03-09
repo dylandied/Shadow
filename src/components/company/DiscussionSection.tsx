@@ -3,9 +3,10 @@ import { useState, useEffect } from "react";
 import CommentSorter from "./CommentSorter";
 import CommentForm from "./CommentForm";
 import CommentsList from "./CommentsList";
+import { Comment } from "@/types";
 
 type DiscussionSectionProps = {
-  comments: any[];
+  comments: Comment[];
   sortBy: string;
   onSortChange: (option: string) => void;
   onSubmitComment: (content: string) => void;
@@ -24,8 +25,7 @@ const DiscussionSection = ({
   // Track daily comment count and remaining comments
   const [commentsRemaining, setCommentsRemaining] = useState<number>(3);
 
-  // Mock function to count user's comments in last 24 hours
-  // In a real app, this would query the database for actual counts
+  // Calculate how many comments are left for the current employee
   useEffect(() => {
     if (isEmployee && isSignedIn) {
       // Count comments made by the current user in the last 24 hours
@@ -35,19 +35,40 @@ const DiscussionSection = ({
       // Filter comments by the current user in the last 24 hours
       // This is a simplified mock implementation
       const recentCommentCount = comments.filter(comment => {
-        return comment.isEmployee && comment.timestamp > last24Hours;
+        return comment.isEmployee && new Date(comment.timestamp) > last24Hours;
       }).length;
       
       setCommentsRemaining(Math.max(0, 3 - recentCommentCount));
     }
   }, [comments, isEmployee, isSignedIn]);
 
-  // Wrapper for the comment submission that checks limits
-  const handleSubmitComment = (content: string) => {
-    if (commentsRemaining > 0) {
-      onSubmitComment(content);
-      setCommentsRemaining(prev => Math.max(0, prev - 1));
+  // Render the appropriate comment form or message based on user state
+  const renderCommentInput = () => {
+    if (!isSignedIn) {
+      return (
+        <div className="mb-6 sm:mb-8 p-3 bg-muted/50 rounded-lg text-center">
+          <p className="text-muted-foreground">Sign in to interact with comments.</p>
+        </div>
+      );
     }
+    
+    if (!isEmployee) {
+      return (
+        <div className="mb-6 sm:mb-8 p-3 bg-muted/50 rounded-lg text-center">
+          <p className="text-muted-foreground">Only verified employees can post comments.</p>
+        </div>
+      );
+    }
+    
+    if (commentsRemaining <= 0) {
+      return (
+        <div className="mb-6 sm:mb-8 p-3 bg-muted/50 rounded-lg text-center">
+          <p className="text-muted-foreground">You've reached your limit of 3 comments per day. Please try again tomorrow.</p>
+        </div>
+      );
+    }
+    
+    return <CommentForm onSubmit={onSubmitComment} commentsRemaining={commentsRemaining} />;
   };
 
   return (
@@ -57,25 +78,7 @@ const DiscussionSection = ({
         <CommentSorter sortBy={sortBy} onSortChange={onSortChange} />
       </div>
       
-      {isSignedIn && isEmployee ? (
-        commentsRemaining > 0 ? (
-          <CommentForm onSubmit={handleSubmitComment} commentsRemaining={commentsRemaining} />
-        ) : (
-          <div className="mb-6 sm:mb-8 p-3 bg-muted/50 rounded-lg text-center">
-            <p className="text-muted-foreground">You've reached your limit of 3 comments per day. Please try again tomorrow.</p>
-          </div>
-        )
-      ) : (
-        isSignedIn ? (
-          <div className="mb-6 sm:mb-8 p-3 bg-muted/50 rounded-lg text-center">
-            <p className="text-muted-foreground">Only verified employees can post comments.</p>
-          </div>
-        ) : (
-          <div className="mb-6 sm:mb-8 p-3 bg-muted/50 rounded-lg text-center">
-            <p className="text-muted-foreground">Sign in to interact with comments.</p>
-          </div>
-        )
-      )}
+      {renderCommentInput()}
       
       <CommentsList comments={comments} isSignedIn={isSignedIn} />
     </div>

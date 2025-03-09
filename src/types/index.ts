@@ -27,10 +27,12 @@ export type Comment = {
   timestamp: Date;
   replies: string[];
   userReputation?: "trusted" | "new";
+  userVote?: "up" | "down" | null;
 };
 
 export type InsightType = "sales" | "traffic" | "satisfaction" | "news";
 export type ChangeDirection = "up" | "down" | "neutral";
+export type VoteType = "up" | "down" | null;
 
 export type Insight = {
   type: InsightType;
