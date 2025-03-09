@@ -100,7 +100,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(true);
       
       // First fetch the email associated with this username
-      // This is a workaround since Supabase auth requires email for signin
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('id')
@@ -111,9 +110,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Username not found');
       }
 
-      // Sign in with the id (which is the same as email in our case)
+      // Sign in with the id as the email
       const { error } = await supabase.auth.signInWithPassword({
-        email: `${username}@example.com`,
+        email: profileData.id,
         password,
       });
 
@@ -177,9 +176,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Username already taken');
       }
       
-      // Create the account
+      // Generate a unique identifier to use as the "email"
+      const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+      
+      // Create the account with a unique ID as the email
       const { data, error } = await supabase.auth.signUp({
-        email: `${username}@example.com`, // Using username as part of email for simplicity
+        email: `${uniqueId}@example.com`,
         password,
         options: {
           data: {
