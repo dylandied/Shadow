@@ -2,7 +2,6 @@
 import { formatDistanceToNow } from "date-fns";
 import UserBadge from "../UserBadge";
 import { cn } from "@/lib/utils";
-import TipButton from "../TipButton";
 
 type CommentHeaderProps = {
   username: string;
@@ -18,7 +17,6 @@ const CommentHeader = ({
   isEmployee,
   userReputation,
   timestamp,
-  bitcoinAddress,
   className,
 }: CommentHeaderProps) => {
   return (
@@ -35,10 +33,6 @@ const CommentHeader = ({
           </p>
         </div>
       </div>
-      
-      {isEmployee && bitcoinAddress && (
-        <TipButton bitcoinAddress={bitcoinAddress} size="sm" />
-      )}
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
@@ -52,11 +51,9 @@ const Comment = ({
     }
 
     if (userVote === "up") {
-      // Removing existing upvote
       setUserVote(null);
       setLocalUpvotes(prev => prev - 1);
     } else {
-      // Adding upvote (and removing downvote if exists)
       if (userVote === "down") {
         setLocalDownvotes(prev => prev - 1);
       }
@@ -76,11 +73,9 @@ const Comment = ({
     }
 
     if (userVote === "down") {
-      // Removing existing downvote
       setUserVote(null);
       setLocalDownvotes(prev => prev - 1);
     } else {
-      // Adding downvote (and removing upvote if exists)
       if (userVote === "up") {
         setLocalUpvotes(prev => prev - 1);
       }
@@ -105,7 +100,6 @@ const Comment = ({
         isEmployee={isEmployee}
         userReputation={userReputation}
         timestamp={timestamp}
-        bitcoinAddress={bitcoinAddress}
       />
       
       <CommentBody content={content} />
