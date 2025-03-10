@@ -1,6 +1,6 @@
 
-import CommentSorter from "@/components/company/CommentSorter";
-import CommentsList from "@/components/company/CommentsList";
+import { CommentSorter } from "@/components/company/CommentSorter";
+import { CommentsList } from "@/components/company/CommentsList";
 import { CommentForm } from "@/components/company/CommentForm";
 import { Comment, SortOption } from "@/types";
 
@@ -9,6 +9,8 @@ export interface DiscussionSectionProps {
   sortBy: SortOption;
   onSortChange: (option: string) => void;
   onSubmitComment: (content: string) => void;
+  isEmployee: boolean;
+  isSignedIn: boolean;
 }
 
 export function DiscussionSection({
@@ -16,6 +18,8 @@ export function DiscussionSection({
   sortBy,
   onSortChange,
   onSubmitComment,
+  isEmployee,
+  isSignedIn,
 }: DiscussionSectionProps) {
   return (
     <div className="space-y-6">
@@ -27,8 +31,9 @@ export function DiscussionSection({
         />
       </div>
 
-      {/* Everyone can now comment, no authentication check */}
-      <CommentForm onSubmit={onSubmitComment} />
+      {isSignedIn && isEmployee && (
+        <CommentForm onSubmit={onSubmitComment} />
+      )}
 
       <CommentsList comments={comments} />
     </div>

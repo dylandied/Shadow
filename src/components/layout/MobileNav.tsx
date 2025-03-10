@@ -1,19 +1,29 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Plus, UserCircle, LogOut, Bitcoin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
 
 type MobileNavProps = {
   isOpen: boolean;
   onAddCompanyClick: () => void;
+  onAuthClick: () => void;
+  onBitcoinAddressClick: () => void;
 };
 
 const MobileNav = ({
   isOpen,
   onAddCompanyClick,
+  onAuthClick,
+  onBitcoinAddressClick,
 }: MobileNavProps) => {
   const location = useLocation();
+  const { user, profile, isEmployee, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   if (!isOpen) return null;
 
@@ -48,6 +58,41 @@ const MobileNav = ({
           <Plus className="h-4 w-4 mr-1" />
           <span>Add Company</span>
         </Button>
+        
+        {user && profile ? (
+          <>
+            {isEmployee && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full flex items-center justify-center"
+                onClick={onBitcoinAddressClick}
+              >
+                <Bitcoin className="h-4 w-4 mr-1" />
+                <span>Change BTC Address</span>
+              </Button>
+            )}
+            <Button
+              variant="default"
+              size="sm"
+              className="w-full flex items-center justify-center"
+              onClick={handleSignOut}
+            >
+              <LogOut className="h-4 w-4 mr-1" />
+              <span>Sign Out</span>
+            </Button>
+          </>
+        ) : (
+          <Button
+            variant="default"
+            size="sm"
+            className="w-full flex items-center justify-center"
+            onClick={onAuthClick}
+          >
+            <UserCircle className="h-4 w-4 mr-1" />
+            <span>Sign In</span>
+          </Button>
+        )}
       </div>
     </div>
   );

@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { AddCompanyDialog } from "@/components/ui/AddCompanyDialog";
+import { AuthDialog } from "@/components/ui/AuthDialog";
+import { BitcoinAddressDialog } from "@/components/ui/BitcoinAddressDialog";
 
 import Logo from "./Logo";
 import DesktopNav from "./DesktopNav";
@@ -15,8 +17,14 @@ const Navbar = () => {
   const location = useLocation();
   const { 
     isAddCompanyOpen, 
-    setIsAddCompanyOpen,
+    setIsAddCompanyOpen, 
+    isAuthOpen, 
+    setIsAuthOpen, 
+    isBitcoinAddressOpen, 
+    setIsBitcoinAddressOpen,
     handleAddCompanyClick,
+    handleAuthClick,
+    handleBitcoinAddressClick
   } = useNavbarDialogs();
   
   // Close mobile menu when route changes
@@ -39,6 +47,8 @@ const Navbar = () => {
         {/* Desktop Navigation */}
         <DesktopNav
           onAddCompanyClick={handleAddCompanyClick}
+          onAuthClick={handleAuthClick}
+          onBitcoinAddressClick={handleBitcoinAddressClick}
         />
         
         {/* Mobile Menu Button */}
@@ -52,10 +62,14 @@ const Navbar = () => {
       <MobileNav
         isOpen={isMobileMenuOpen}
         onAddCompanyClick={() => handleMobileDialogClick(handleAddCompanyClick)}
+        onAuthClick={() => handleMobileDialogClick(handleAuthClick)}
+        onBitcoinAddressClick={() => handleMobileDialogClick(handleBitcoinAddressClick)}
       />
       
       {/* Dialogs */}
       <AddCompanyDialog open={isAddCompanyOpen} onOpenChange={setIsAddCompanyOpen} />
+      <AuthDialog open={isAuthOpen} onOpenChange={setIsAuthOpen} />
+      <BitcoinAddressDialog open={isBitcoinAddressOpen} onOpenChange={setIsBitcoinAddressOpen} />
     </>
   );
 };
