@@ -1,41 +1,34 @@
-import { ChevronDown } from "lucide-react";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
+
 import { Button } from "@/components/ui/button";
-import { SortOption } from "@/types";
 
 type CommentSorterProps = {
-  onChange: (option: string) => void;
-  value: SortOption;
+  sortBy: string;
+  onSortChange: (option: string) => void;
 };
 
-const CommentSorter = ({ onChange, value }: CommentSorterProps) => {
+const CommentSorter = ({ sortBy, onSortChange }: CommentSorterProps) => {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <Button
-        variant={value === "recent" ? "default" : "outline"}
+        variant={sortBy === "recent" ? "default" : "outline"}
         size="sm"
-        onClick={() => onChange("recent")}
+        onClick={() => onSortChange("recent")}
         className="text-xs h-8"
       >
         Recent
       </Button>
       <Button
-        variant={value === "upvoted" ? "default" : "outline"}
+        variant={sortBy === "upvoted" ? "default" : "outline"}
         size="sm"
-        onClick={() => onChange("upvoted")}
+        onClick={() => onSortChange("upvoted")}
         className="text-xs h-8"
       >
         Most Upvoted
       </Button>
       <Button
-        variant={value === "tipped" ? "default" : "outline"}
+        variant={sortBy === "tipped" ? "default" : "outline"}
         size="sm"
-        onClick={() => onChange("tipped")}
+        onClick={() => onSortChange("tipped")}
         className="text-xs h-8"
       >
         Most Tipped

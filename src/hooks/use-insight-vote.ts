@@ -9,7 +9,8 @@ type VoteType = "up" | "down" | null;
 export function useInsightVote(
   companyId?: string,
   insightType?: InsightType,
-  isSignedIn = false
+  isSignedIn = false,
+  isEmployee = false
 ) {
   const [userVote, setUserVote] = useState<VoteType>(null);
   const [lastVoteDate, setLastVoteDate] = useState<Date | null>(null);
@@ -84,6 +85,15 @@ export function useInsightVote(
       toast({
         title: "Authentication required",
         description: "Please sign in to vote on insights.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!isEmployee) {
+      toast({
+        title: "Employee access required",
+        description: "Only employees can vote on company insights.",
         variant: "destructive",
       });
       return;

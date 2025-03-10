@@ -10,8 +10,7 @@ import {
   signUp as authSignUp,
   signOut as authSignOut,
   updateBitcoinAddress as authUpdateBitcoinAddress
-} from '@/hooks/auth';
-import { UserType } from '@/types';
+} from '@/hooks/use-auth-api';
 
 interface AuthContextType {
   session: Session | null;
@@ -19,10 +18,8 @@ interface AuthContextType {
   profile: UserProfile | null;
   isLoading: boolean;
   isEmployee: boolean;
-  isAdmin: boolean;
-  userType: UserType | null;
   signIn: (username: string, password: string) => Promise<void>;
-  signUp: (username: string, password: string, userType: UserType, bitcoinAddress?: string) => Promise<void>;
+  signUp: (username: string, password: string, userType: 'trader' | 'employee', bitcoinAddress?: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateBitcoinAddress: (bitcoinAddress: string) => Promise<void>;
 }
@@ -89,7 +86,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const handleSignUp = async (
     username: string, 
     password: string, 
-    userType: UserType, 
+    userType: 'trader' | 'employee', 
     bitcoinAddress?: string
   ) => {
     setIsLoading(true);
@@ -135,10 +132,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const userType = profile?.user_type as UserType | null;
-  const isEmployee = userType === 'employee';
-  const isAdmin = userType === 'admin';
-
   return (
     <AuthContext.Provider
       value={{
@@ -146,9 +139,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         profile,
         isLoading,
-        isEmployee,
-        isAdmin,
-        userType,
+        isEmployee: profile?.user_type === 'employee',
         signIn: handleSignIn,
         signUp: handleSignUp,
         signOut: handleSignOut,

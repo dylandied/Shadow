@@ -1,31 +1,21 @@
+
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import InsightCard from "@/components/ui/InsightCard";
 import { containerVariants, itemVariants } from "@/utils/animationVariants";
-import { usePermissions } from "@/hooks/use-permissions";
-import { useAuth } from "@/context/AuthContext";
-import { Insight } from "@/types";
-import { useInsightVote } from "@/hooks/use-insight-vote";
 
 type InsightsSectionProps = {
-  insights?: Insight[];
-  companyId: string;
-  isLoading?: boolean;
-  isEmployee: boolean;
-  isSignedIn: boolean;
+  companyId?: string;
+  isEmployee?: boolean;
+  isSignedIn?: boolean;
 };
 
 const InsightsSection = ({
-  insights = [],
   companyId,
-  isLoading = false,
-  isEmployee,
-  isSignedIn
+  isEmployee = false,
+  isSignedIn = false,
 }: InsightsSectionProps) => {
-  const { user } = useAuth();
-  const { canVoteOnInsights } = usePermissions();
-
   // Set up real-time subscription for vote updates
   useEffect(() => {
     if (!companyId) return;
@@ -71,8 +61,8 @@ const InsightsSection = ({
           sourcesCount={5}
           lastUpdated="2 hours ago"
           companyId={companyId}
-          canVote={canVoteOnInsights}
-          isSignedIn={!!user}
+          isEmployee={isEmployee}
+          isSignedIn={isSignedIn}
         />
       </motion.div>
       
@@ -85,8 +75,8 @@ const InsightsSection = ({
           sourcesCount={3}
           lastUpdated="1 day ago"
           companyId={companyId}
-          canVote={canVoteOnInsights}
-          isSignedIn={!!user}
+          isEmployee={isEmployee}
+          isSignedIn={isSignedIn}
         />
       </motion.div>
       
@@ -99,8 +89,8 @@ const InsightsSection = ({
           sourcesCount={8}
           lastUpdated="5 days ago"
           companyId={companyId}
-          canVote={canVoteOnInsights}
-          isSignedIn={!!user}
+          isEmployee={isEmployee}
+          isSignedIn={isSignedIn}
         />
       </motion.div>
       
@@ -113,8 +103,8 @@ const InsightsSection = ({
           sourcesCount={4}
           lastUpdated="3 hours ago"
           companyId={companyId}
-          canVote={canVoteOnInsights}
-          isSignedIn={!!user}
+          isEmployee={isEmployee}
+          isSignedIn={isSignedIn}
         />
       </motion.div>
     </motion.div>

@@ -1,41 +1,45 @@
 
-import { CommentSorter } from "@/components/company/CommentSorter";
-import { CommentsList } from "@/components/company/CommentsList";
-import { CommentForm } from "@/components/company/CommentForm";
-import { Comment, SortOption } from "@/types";
+import { useState } from "react";
+import { SortOption } from "@/types";
+import { Comment } from "@/types";
+import CommentForm from "./CommentForm";
+import CommentsList from "./CommentsList";
+import CommentSorter from "./CommentSorter";
 
-export interface DiscussionSectionProps {
+export type DiscussionSectionProps = {
   comments: Comment[];
   sortBy: SortOption;
   onSortChange: (option: string) => void;
   onSubmitComment: (content: string) => void;
   isEmployee: boolean;
   isSignedIn: boolean;
-}
+};
 
-export function DiscussionSection({
+const DiscussionSection = ({
   comments,
   sortBy,
   onSortChange,
   onSubmitComment,
   isEmployee,
-  isSignedIn,
-}: DiscussionSectionProps) {
+  isSignedIn
+}: DiscussionSectionProps) => {
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Discussion</h2>
-        <CommentSorter 
-          onChange={onSortChange} 
-          value={sortBy} 
-        />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h2 className="text-2xl font-semibold tracking-tight">Discussion</h2>
+        <CommentSorter value={sortBy} onChange={onSortChange} />
       </div>
-
-      {isSignedIn && isEmployee && (
+      
+      {isEmployee && (
         <CommentForm onSubmit={onSubmitComment} />
       )}
-
-      <CommentsList comments={comments} />
+      
+      <CommentsList 
+        comments={comments} 
+        isSignedIn={isSignedIn}
+      />
     </div>
   );
-}
+};
+
+export default DiscussionSection;

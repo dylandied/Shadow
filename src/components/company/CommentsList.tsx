@@ -1,14 +1,14 @@
 
 import Comment from "@/components/ui/Comment";
 import { Comment as CommentType } from "@/types";
-import { usePermissions } from "@/hooks/use-permissions";
+import { useAuth } from "@/context/AuthContext";
 
 type CommentsListProps = {
   comments: CommentType[];
 };
 
 const CommentsList = ({ comments }: CommentsListProps) => {
-  const { canDeleteComments } = usePermissions();
+  const { user } = useAuth();
   
   if (comments.length === 0) {
     return (

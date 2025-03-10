@@ -6,7 +6,6 @@ import CommentBody from "./comment/CommentBody";
 import CommentActions from "./comment/CommentActions";
 import { useCommentVote } from "@/hooks/use-comment-vote";
 import { useAuth } from "@/context/AuthContext";
-import { usePermissions } from "@/hooks/use-permissions";
 
 type CommentProps = {
   id: string;
@@ -29,23 +28,28 @@ const Comment = ({
   content,
   bitcoinAddress,
   isEmployee,
-  upvotes: initialUpvotes,
-  downvotes: initialDownvotes,
+  upvotes,
+  downvotes,
   timestamp,
   replyTo,
   userReputation,
   className,
 }: CommentProps) => {
-  const { canVoteOnComments } = usePermissions();
+  const { user } = useAuth();
+  const isSignedIn = !!user;
   
   const { 
     userVote, 
-    upvotes, 
-    downvotes,
+    upvotes: localUpvotes, 
+    downvotes: localDownvotes,
     handleUpvote,
-    handleDownvote,
-    isLoading 
-  } = useCommentVote(id);
+    handleDownvote 
+  } = useCommentVote({
+    initialUpvotes: upvotes,
+    initialDownvotes: downvotes,
+    isSignedIn,
+    commentId: id
+  });
   
   return (
     <motion.div
@@ -70,13 +74,11 @@ const Comment = ({
       <CommentActions 
         isEmployee={isEmployee}
         bitcoinAddress={bitcoinAddress}
-        upvotes={upvotes}
-        downvotes={downvotes}
+        upvotes={localUpvotes}
+        downvotes={localDownvotes}
         userVote={userVote}
         onUpvote={handleUpvote}
         onDownvote={handleDownvote}
-        canVote={canVoteOnComments}
-        isLoading={isLoading}
       />
     </motion.div>
   );
