@@ -50,7 +50,7 @@ const InsightsSection = ({
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-10"
+      className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-10"
     >
       <motion.div variants={itemVariants}>
         <InsightCard
@@ -60,20 +60,6 @@ const InsightsSection = ({
           change="up"
           sourcesCount={5}
           lastUpdated="2 hours ago"
-          companyId={companyId}
-          isEmployee={isEmployee}
-          isSignedIn={isSignedIn}
-        />
-      </motion.div>
-      
-      <motion.div variants={itemVariants}>
-        <InsightCard
-          type="traffic"
-          title="Foot Traffic"
-          value="Moderate"
-          change="down"
-          sourcesCount={3}
-          lastUpdated="1 day ago"
           companyId={companyId}
           isEmployee={isEmployee}
           isSignedIn={isSignedIn}

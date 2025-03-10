@@ -1,3 +1,4 @@
+
 export type Company = {
   id: string;
   name: string;
@@ -29,7 +30,7 @@ export type Comment = {
   userVote?: VoteType;
 };
 
-export type InsightType = "sales" | "traffic" | "satisfaction" | "news";
+export type InsightType = "sales" | "satisfaction" | "news";
 export type ChangeDirection = "up" | "down" | "neutral";
 export type VoteType = "up" | "down" | null;
 
