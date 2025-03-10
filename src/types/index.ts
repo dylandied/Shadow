@@ -28,6 +28,7 @@ export type Comment = {
   replies: string[];
   userReputation?: "trusted" | "new";
   userVote?: VoteType;
+  badge?: InsightType | "other";
 };
 
 export type InsightType = "sales" | "satisfaction" | "news";

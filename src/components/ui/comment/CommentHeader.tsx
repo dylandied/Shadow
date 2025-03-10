@@ -10,6 +10,10 @@ type CommentHeaderProps = {
   timestamp: Date;
   bitcoinAddress?: string;
   className?: string;
+  badge?: {
+    icon: React.ReactNode;
+    label: string;
+  };
 };
 
 const CommentHeader = ({
@@ -18,6 +22,7 @@ const CommentHeader = ({
   userReputation,
   timestamp,
   className,
+  badge,
 }: CommentHeaderProps) => {
   return (
     <div className={cn("flex justify-between items-start", className)}>
@@ -27,6 +32,13 @@ const CommentHeader = ({
             <h4 className="font-medium">{username}</h4>
             {isEmployee && <UserBadge type="insider" size="sm" />}
             {userReputation && <UserBadge type={userReputation} size="sm" />}
+            
+            {badge && (
+              <div className="flex items-center gap-1 text-xs border border-border rounded-full px-2 py-0.5 bg-background">
+                {badge.icon}
+                <span className="text-muted-foreground">{badge.label}</span>
+              </div>
+            )}
           </div>
           <p className="text-xs text-muted-foreground">
             {formatDistanceToNow(timestamp, { addSuffix: true })}

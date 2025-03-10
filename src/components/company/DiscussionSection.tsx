@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { SortOption } from "@/types";
+import { SortOption, InsightType } from "@/types";
 import { Comment } from "@/types";
 import CommentForm from "./CommentForm";
 import CommentsList from "./CommentsList";
@@ -11,7 +11,7 @@ export type DiscussionSectionProps = {
   comments: Comment[];
   sortBy: SortOption;
   onSortChange: (option: string) => void;
-  onSubmitComment: (content: string) => void;
+  onSubmitComment: (content: string, badge: InsightType | "other") => void;
   isEmployee: boolean;
   isSignedIn: boolean;
 };
@@ -33,7 +33,7 @@ const DiscussionSection = ({
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h2 className="text-2xl font-semibold tracking-tight">Employee Insights</h2>
-        <CommentSorter value={sortBy} onChange={onSortChange} />
+        <CommentSorter sortBy={sortBy} onChange={onSortChange} />
       </div>
       
       {canComment && (

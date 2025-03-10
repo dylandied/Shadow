@@ -37,6 +37,7 @@ const CommentsList = ({ comments }: CommentsListProps) => {
           downvotes={comment.downvotes}
           timestamp={comment.timestamp}
           userReputation={comment.userReputation}
+          badge={comment.badge}
         />
       ))}
     </div>

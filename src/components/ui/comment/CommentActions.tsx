@@ -1,4 +1,3 @@
-
 import { ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import TipButton from "../TipButton";
@@ -11,10 +10,10 @@ type CommentActionsProps = {
   bitcoinAddress?: string;
   upvotes: number;
   downvotes: number;
-  userVote: VoteType;
+  userVote?: VoteType;
   onUpvote: () => void;
   onDownvote: () => void;
-  className?: string;
+  isVoteLoading?: boolean;
 };
 
 const CommentActions = ({
@@ -25,12 +24,12 @@ const CommentActions = ({
   userVote,
   onUpvote,
   onDownvote,
+  isVoteLoading,
   className,
 }: CommentActionsProps) => {
   const { user } = useAuth();
   const isSignedIn = !!user;
   
-  // Render vote button with appropriate styles based on state
   const renderVoteButton = (
     type: "up" | "down", 
     count: number, 

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { mockCompanies, mockComments } from "@/data/mockData";
@@ -117,7 +116,7 @@ const Company = () => {
   };
   
   // Handle new comment submission
-  const handleSubmitComment = (content: string) => {
+  const handleSubmitComment = (content: string, badge: InsightType | "other") => {
     if (!isSignedIn || !isEmployee) {
       toast({
         title: "Permission denied",
@@ -139,7 +138,8 @@ const Company = () => {
       timestamp: new Date(),
       userReputation: "trusted",
       replies: [],
-      tipAmount: 0
+      tipAmount: 0,
+      badge: badge
     };
     
     // Add the new comment to the list
