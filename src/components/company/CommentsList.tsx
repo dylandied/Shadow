@@ -10,11 +10,14 @@ type CommentsListProps = {
 const CommentsList = ({ comments }: CommentsListProps) => {
   const { user } = useAuth();
   
-  if (comments.length === 0) {
+  // Filter out any non-employee comments
+  const employeeComments = comments.filter(comment => comment.isEmployee);
+  
+  if (employeeComments.length === 0) {
     return (
       <div className="text-center py-6 sm:py-8">
         <p className="text-muted-foreground">
-          No comments yet. Be the first to share an insight!
+          No employee insights yet. Check back later!
         </p>
       </div>
     );
@@ -22,7 +25,7 @@ const CommentsList = ({ comments }: CommentsListProps) => {
   
   return (
     <div className="space-y-3 sm:space-y-4">
-      {comments.map((comment) => (
+      {employeeComments.map((comment) => (
         <Comment
           key={comment.id}
           id={comment.id}

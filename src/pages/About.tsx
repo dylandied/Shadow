@@ -54,7 +54,7 @@ const About = () => {
                     <strong>Valuable Information:</strong> Get early indicators on sales trends, foot traffic, employee satisfaction, and upcoming news.
                   </li>
                   <li className="text-foreground">
-                    <strong>Interactive Platform:</strong> Comment, upvote, and tip valuable contributors.
+                    <strong>Interactive Platform:</strong> Upvote and tip valuable contributors.
                   </li>
                   <li className="text-foreground">
                     <strong>Company Directory:</strong> Browse or search for companies of interest.

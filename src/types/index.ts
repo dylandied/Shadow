@@ -1,4 +1,3 @@
-
 export type Company = {
   id: string;
   name: string;
@@ -27,7 +26,7 @@ export type Comment = {
   timestamp: Date;
   replies: string[];
   userReputation?: "trusted" | "new";
-  userVote?: "up" | "down" | null;
+  userVote?: VoteType;
 };
 
 export type InsightType = "sales" | "traffic" | "satisfaction" | "news";
@@ -42,3 +41,5 @@ export type Insight = {
   sourcesCount: number;
   lastUpdated: string;
 };
+
+export type SortOption = "recent" | "upvoted" | "tipped";
