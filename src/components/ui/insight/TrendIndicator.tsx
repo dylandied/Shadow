@@ -7,7 +7,7 @@ export type ChangeDirection = "up" | "down" | "neutral";
 type TrendIndicatorProps = {
   change: ChangeDirection;
   showLabel?: boolean;
-  type?: "sales" | "traffic" | "satisfaction" | "news";
+  type?: "sales" | "satisfaction" | "news";
 };
 
 export const getTrendStyles = (change: ChangeDirection) => {
@@ -34,11 +34,11 @@ const TrendIndicator = ({ change, showLabel = true, type }: TrendIndicatorProps)
   
   const { textColor } = getTrendStyles(change);
   
-  // For satisfaction, use thumbs up/down
+  // For satisfaction, use smiley/frowny faces
   if (type === "satisfaction") {
     return (
       <div className={cn("flex items-center space-x-1", textColor)}>
-        {change === "up" ? <ThumbsUp className="h-4 w-4" /> : <ThumbsDown className="h-4 w-4" />}
+        {change === "up" ? <SmileIcon className="h-4 w-4" /> : <FrownIcon className="h-4 w-4" />}
         {showLabel && (
           <span className="text-xs font-medium">{change === "up" ? "Good" : "Bad"}</span>
         )}
@@ -46,11 +46,11 @@ const TrendIndicator = ({ change, showLabel = true, type }: TrendIndicatorProps)
     );
   }
   
-  // If it's a news type insight, use smiling/frowning faces with Good/Bad text
+  // For news, use thumbs up/down
   if (type === "news") {
     return (
       <div className={cn("flex items-center space-x-1", textColor)}>
-        {change === "up" ? <SmileIcon className="h-4 w-4" /> : <FrownIcon className="h-4 w-4" />}
+        {change === "up" ? <ThumbsUp className="h-4 w-4" /> : <ThumbsDown className="h-4 w-4" />}
         {showLabel && (
           <span className="text-xs font-medium">{change === "up" ? "Good" : "Bad"}</span>
         )}
