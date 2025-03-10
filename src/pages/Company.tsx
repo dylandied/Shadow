@@ -9,7 +9,7 @@ import { Comment, Company as CompanyType } from "@/types";
 // Import refactored components
 import CompanyHeader from "@/components/company/CompanyHeader";
 import InsightsSection from "@/components/company/InsightsSection";
-import { DiscussionSection } from "@/components/company/DiscussionSection";
+import DiscussionSection from "@/components/company/DiscussionSection";
 import LoadingState from "@/components/company/LoadingState";
 import NotFoundState from "@/components/company/NotFoundState";
 
@@ -44,19 +44,13 @@ const Company = () => {
         setCompany(null);
       }
       
-      // Filter comments for this company, ONLY showing employee comments
+      // Filter comments for this company
       const companyComments = mockComments
-        .filter(c => c.companyId === id && c.isEmployee === true) // Only show employee comments
-        .map(comment => {
-          // Add trusted badge for comments with 20+ upvotes
-          const userReputation = comment.upvotes >= 20 ? "trusted" : comment.userReputation;
-          
-          return {
-            ...comment,
-            timestamp: new Date(comment.timestamp),
-            userReputation
-          };
-        });
+        .filter(c => c.companyId === id)
+        .map(comment => ({
+          ...comment,
+          timestamp: new Date(comment.timestamp)
+        }));
       
       // Sort comments based on selected option
       const sortedComments = sortCommentArray(companyComments, sortBy);
@@ -78,17 +72,13 @@ const Company = () => {
         .on('postgres_changes', 
           { event: 'INSERT', schema: 'public', table: 'comments', filter: `company_id=eq.${id}` },
           (payload) => {
-            // Add new comment to the list and resort only if it's from an employee
+            // Add new comment to the list and resort
             const newComment = payload.new as Comment;
-            if (newComment && newComment.isEmployee) {
-              // Add trusted badge if upvotes >= 20
-              const userRep = newComment.upvotes >= 20 ? "trusted" : newComment.userReputation;
-              
+            if (newComment) {
               setComments(prevComments => {
                 const updatedComments = [...prevComments, {
                   ...newComment,
-                  timestamp: new Date(newComment.timestamp),
-                  userReputation: userRep
+                  timestamp: new Date(newComment.timestamp)
                 }];
                 return sortCommentArray(updatedComments, sortBy);
               });
@@ -128,17 +118,26 @@ const Company = () => {
   
   // Handle new comment submission
   const handleSubmitComment = (content: string) => {
+    if (!isSignedIn || !isEmployee) {
+      toast({
+        title: "Permission denied",
+        description: "Only signed-in employees can post comments.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Create a new comment object
     const newComment: Comment = {
       id: `comment-${Date.now()}`,
       companyId: id || '',
       username: "Current User",
       content: content,
-      isEmployee: true, // All comments are now from employees
+      isEmployee: isEmployee,
       upvotes: 0,
       downvotes: 0,
       timestamp: new Date(),
-      userReputation: "new", // New comments start as "new"
+      userReputation: "trusted",
       replies: [],
       tipAmount: 0
     };
@@ -148,7 +147,7 @@ const Company = () => {
     setComments(sortCommentArray(updatedComments, sortBy));
     
     // If the user is an employee, update the company's insider count and timestamp
-    if (company) {
+    if (isEmployee && company) {
       setCompany(prev => ({
         ...prev!,
         insidersCount: prev!.insidersCount + 1,
@@ -176,14 +175,16 @@ const Company = () => {
       <CompanyHeader company={company} />
       <InsightsSection 
         companyId={company.id}
-        isEmployee={true} // All insights are now visible
-        isSignedIn={true} // All users can now see insights
+        isEmployee={isEmployee}
+        isSignedIn={isSignedIn}
       />
       <DiscussionSection 
         comments={comments}
         sortBy={sortBy}
         onSortChange={handleSortChange}
         onSubmitComment={handleSubmitComment}
+        isEmployee={isEmployee}
+        isSignedIn={isSignedIn}
       />
     </div>
   );

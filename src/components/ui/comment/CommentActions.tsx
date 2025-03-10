@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import TipButton from "../TipButton";
 import { cn } from "@/lib/utils";
 import { VoteType } from "@/types";
+import { useAuth } from "@/context/AuthContext";
 
 type CommentActionsProps = {
   isEmployee: boolean;

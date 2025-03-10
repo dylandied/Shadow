@@ -1,25 +1,16 @@
 
-/**
- * Hook for determining user permissions throughout the application
- * 
- * Rules:
- * 1. Anyone can view the site regardless of if they are signed in or not
- * 2. Only signed in employees can leave comments 
- * 3. Only signed in employees can vote on company cards
- * 4. Any signed in user can vote on comments
- * 5. Each user can only vote once per comment
- */
 export function usePermissions() {
+  // All permissions are now granted to everyone
   return {
-    // Comment permissions - only employees can comment
-    canComment: true, // For simplicity in the demo, we're allowing comments
+    // Comment permissions
+    canComment: true,
     canDeleteComments: true,
     
     // Company permissions
     canAddCompanies: true,
     canDeleteCompanies: true,
     
-    // Voting permissions - only employees can vote on insights
+    // Voting permissions
     canVoteOnInsights: true,
     canVoteOnComments: true,
     
