@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { mockCompanies, mockComments } from "@/data/mockData";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Comment, Company as CompanyType } from "@/types";
+import { Comment, Company as CompanyType, InsightType, SortOption } from "@/types";
 
 // Import refactored components
 import CompanyHeader from "@/components/company/CompanyHeader";
@@ -11,9 +11,6 @@ import InsightsSection from "@/components/company/InsightsSection";
 import DiscussionSection from "@/components/company/DiscussionSection";
 import LoadingState from "@/components/company/LoadingState";
 import NotFoundState from "@/components/company/NotFoundState";
-
-// Available sort options
-type SortOption = "recent" | "upvoted" | "tipped";
 
 const Company = () => {
   const { id } = useParams<{ id: string }>();

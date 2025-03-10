@@ -1,3 +1,4 @@
+
 import { ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import TipButton from "../TipButton";
@@ -14,6 +15,7 @@ type CommentActionsProps = {
   onUpvote: () => void;
   onDownvote: () => void;
   isVoteLoading?: boolean;
+  className?: string;
 };
 
 const CommentActions = ({
