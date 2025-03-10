@@ -7,7 +7,7 @@
  * 2. Only signed in employees can leave comments 
  * 3. Only signed in employees can vote on company cards
  * 4. Any signed in user can vote on comments
- * 5. Each user can only vote once per comment, but must be able to change vote
+ * 5. Each user can only vote once per comment
  */
 export function usePermissions() {
   return {

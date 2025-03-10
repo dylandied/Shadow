@@ -56,11 +56,15 @@ export function useCommentVote(commentId: string) {
     setIsLoading(true);
     
     try {
-      // If already upvoted, do nothing (prevent vote removal)
+      // If already upvoted, remove vote
       if (currentVote === 'up') {
-        // No action - votes can't be removed, only changed
-        setIsLoading(false);
-        return;
+        await supabase.rpc('delete_comment_vote', {
+          p_comment_id: commentId,
+          p_user_id: user?.id || 'anonymous'
+        });
+        
+        setCurrentVote(null);
+        setUpvotes(prev => Math.max(0, prev - 1));
       }
       // If downvoted, change to upvote
       else if (currentVote === 'down') {
@@ -102,11 +106,15 @@ export function useCommentVote(commentId: string) {
     setIsLoading(true);
     
     try {
-      // If already downvoted, do nothing (prevent vote removal)
+      // If already downvoted, remove vote
       if (currentVote === 'down') {
-        // No action - votes can't be removed, only changed
-        setIsLoading(false);
-        return;
+        await supabase.rpc('delete_comment_vote', {
+          p_comment_id: commentId,
+          p_user_id: user?.id || 'anonymous'
+        });
+        
+        setCurrentVote(null);
+        setDownvotes(prev => Math.max(0, prev - 1));
       }
       // If upvoted, change to downvote
       else if (currentVote === 'up') {
